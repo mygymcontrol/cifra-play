@@ -39,7 +39,7 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
       if (sectionMatch) {
         inRefrao = /refrão|refrao|coro/i.test(sectionMatch[1])
         return (
-          <div key={i} className="section-header mt-4 mb-1">
+          <div key={i} className="section-header mt-2 mb-0.5">
             <span className="inline-block px-2 py-0.5 bg-primary-100 text-primary-700 text-xs font-bold rounded uppercase tracking-wide">
               {sectionMatch[1]}
             </span>
@@ -52,7 +52,7 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
       if (isSectionLine(line)) {
         inRefrao = /refrão|refrao|coro/i.test(line)
         return (
-          <div key={i} className="section-header mt-4 mb-1 text-primary-600 font-bold whitespace-pre">
+          <div key={i} className="section-header mt-2 mb-0.5 text-primary-600 font-bold whitespace-pre">
             {line}
           </div>
         )
@@ -172,7 +172,7 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
         {/* Corpo */}
         <div
           className="cifra-content font-mono leading-relaxed"
-          style={{ fontSize: `${fontSize}px`, lineHeight: '1.6' }}
+          style={{ fontSize: `${fontSize}px`, lineHeight: '1.3' }}
         >
           {renderContent(displayContent)}
         </div>

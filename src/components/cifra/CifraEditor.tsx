@@ -196,7 +196,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
         inRefrao = /refrão|refrao|coro/i.test(sectionMatch[1])
         const repeat = sectionRepeats[i]
         return (
-          <div key={i} className="section-header mt-4 mb-1 relative inline-block">
+          <div key={i} className="section-header mt-2 mb-0.5 relative inline-block">
             <span
               className={`inline-flex items-center gap-1 px-2 py-0.5 ${color.bg} ${color.bgText} text-xs font-bold rounded uppercase tracking-wide cursor-pointer hover:opacity-80 no-print-hover`}
               onClick={() => setActiveRepeatLine(activeRepeatLine === i ? null : i)}
@@ -232,7 +232,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
         inRefrao = /refrão|refrao|coro/i.test(line)
         const repeat = sectionRepeats[i]
         return (
-          <div key={i} className="section-header mt-4 mb-1 relative inline-block">
+          <div key={i} className="section-header mt-2 mb-0.5 relative inline-block">
             <span
               className={`${color.class} font-bold whitespace-pre cursor-pointer hover:opacity-80`}
               onClick={() => setActiveRepeatLine(activeRepeatLine === i ? null : i)}
@@ -536,7 +536,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
                           ? `font-bold ${color.class}`
                           : 'text-gray-800'
                       }`}
-                      style={{ fontSize: `${fontSize}px`, lineHeight: '1.6' }}
+                      style={{ fontSize: `${fontSize}px`, lineHeight: '1.3' }}
                     />
                   </div>
                 </div>
@@ -546,7 +546,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
         ) : (
           <div
             className="cifra-content font-mono"
-            style={{ fontSize: `${fontSize}px`, lineHeight: '1.6' }}
+            style={{ fontSize: `${fontSize}px`, lineHeight: '1.3' }}
           >
             {renderContent(displayContent)}
           </div>
