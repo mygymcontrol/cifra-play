@@ -39,9 +39,82 @@
 .cifra-content {
   font-family: 'Courier New', Courier, monospace;
   white-space: pre-wrap;
-  line-height: 1.8;
 }
 
-.cifra-content .chord {
-  @apply text-primary-600 font-bold;
+.cifra-content .chord-line {
+  font-weight: 700;
+}
+
+.cifra-sheet {
+  padding: 24px;
+}
+
+/* Print styles - Layout A4 */
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .no-print,
+  nav,
+  .no-print * {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .cifra-sheet {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 10mm 12mm;
+    margin: 0;
+    width: 100%;
+    max-width: 210mm;
+    min-height: 277mm; /* A4 height minus margins */
+    page-break-inside: avoid;
+  }
+
+  .cifra-header {
+    margin-bottom: 4mm !important;
+    padding-bottom: 2mm !important;
+  }
+
+  .cifra-content {
+    line-height: 1.4 !important;
+  }
+
+  .section-header {
+    margin-top: 3mm !important;
+    margin-bottom: 1mm !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm;
+  }
+
+  .page-break-after {
+    page-break-after: always;
+  }
+
+  .page-break-after:last-child {
+    page-break-after: auto;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .print\:block {
+    display: block !important;
+  }
 }

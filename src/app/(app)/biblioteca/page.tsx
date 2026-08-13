@@ -1,55 +1,103 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { Search, Plus, X } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+import type { Cifra } from '@/types'
 
-export default async function BibliotecaPage() {
-  const supabase = createServerSupabaseClient()
+export default function BibliotecaPage() {
+  const [cifras, setCifras] = useState<Cifra[]>([])
+  const [search, setSearch] = useState('')
+  const [loading, setLoading] = useState(true)
+  const supabase = createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
+  useEffect(() => {
+    loadCifras()
+  }, [])
 
-  const { data: cifras } = await supabase
-    .from('cifras')
-    .select('*')
-    .eq('user_id', user!.id)
-    .order('title', { ascending: true })
+  async function loadCifras() {
+    const { data } = await supabase
+      .from('cifras')
+      .select('*')
+      .order('title', { ascending: true })
+
+    setCifras(data || [])
+    setLoading(false)
+  }
+
+  const filtered = cifras.filter((c) => {
+    const q = search.toLowerCase()
+    return (
+      c.title.toLowerCase().includes(q) ||
+      c.artist.toLowerCase().includes(q) ||
+      (c.category && c.category.toLowerCase().includes(q))
+    )
+  })
+
+  if (loading) {
+    return <div className="text-center py-12 text-gray-500">Carregando...</div>
+  }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Minha Biblioteca</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Biblioteca</h1>
         <Link
           href="/cifras/nova"
-          className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          className="inline-flex items-center gap-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
-          + Nova Cifra
+          <Plus className="w-4 h-4" />
+          Nova Cifra
         </Link>
       </div>
 
-      {cifras && cifras.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {cifras.map((cifra) => (
+      {/* Busca */}
+      <div className="relative mb-6">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Buscar por título, artista ou categoria..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+        />
+        {search && (
+          <button
+            onClick={() => setSearch('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            aria-label="Limpar busca"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      <p className="text-sm text-gray-500 mb-4">
+        {filtered.length} cifra{filtered.length !== 1 ? 's' : ''} encontrada{filtered.length !== 1 ? 's' : ''}
+      </p>
+
+      {filtered.length > 0 ? (
+        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((cifra) => (
             <Link
               key={cifra.id}
               href={`/cifras/${cifra.id}`}
-              className="block p-5 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+              className="block p-4 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-primary-200 transition-all"
             >
-              <h3 className="font-semibold text-gray-900 truncate">
+              <h3 className="font-semibold text-gray-900 truncate text-sm">
                 {cifra.title}
               </h3>
-              <p className="text-sm text-gray-500 mt-1">{cifra.artist}</p>
-              <div className="flex gap-2 mt-3">
+              <p className="text-xs text-gray-500 mt-0.5 truncate">{cifra.artist}</p>
+              <div className="flex gap-1.5 mt-2 flex-wrap">
                 {cifra.tom && (
-                  <span className="px-2 py-0.5 text-xs bg-primary-100 text-primary-700 rounded">
+                  <span className="px-1.5 py-0.5 text-[10px] font-medium bg-primary-50 text-primary-700 rounded">
                     {cifra.tom}
                   </span>
                 )}
                 {cifra.category && (
-                  <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
+                  <span className="px-1.5 py-0.5 text-[10px] bg-gray-100 text-gray-600 rounded">
                     {cifra.category}
-                  </span>
-                )}
-                {!cifra.is_public && (
-                  <span className="px-2 py-0.5 text-xs bg-amber-100 text-amber-700 rounded">
-                    Privada
                   </span>
                 )}
               </div>
@@ -58,10 +106,7 @@ export default async function BibliotecaPage() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-gray-500">Sua biblioteca está vazia.</p>
-          <Link href="/cifras/nova" className="text-primary-600 hover:underline mt-2 inline-block">
-            Adicione sua primeira cifra
-          </Link>
+          <p className="text-gray-500">Nenhuma cifra encontrada para &ldquo;{search}&rdquo;</p>
         </div>
       )}
     </div>

@@ -1,15 +1,13 @@
 import Link from 'next/link'
+import { Library, ListMusic, PlusCircle } from 'lucide-react'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export default async function HomePage() {
   const supabase = createServerSupabaseClient()
 
-  const { data: cifras } = await supabase
+  const { count } = await supabase
     .from('cifras')
-    .select('*')
-    .eq('is_public', true)
-    .order('created_at', { ascending: false })
-    .limit(10)
+    .select('*', { count: 'exact', head: true })
 
   return (
     <div>
@@ -20,48 +18,33 @@ export default async function HomePage() {
         </p>
       </div>
 
-      <div className="flex gap-4 mb-8">
+      <div className="grid gap-4 sm:grid-cols-3 mb-8">
         <Link
-          href="/cifras/nova"
-          className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          href="/repertorio"
+          className="flex flex-col items-center gap-3 p-6 bg-primary-50 border-2 border-primary-200 rounded-xl hover:bg-primary-100 transition-colors"
         >
-          + Nova Cifra
+          <ListMusic className="w-8 h-8 text-primary-600" />
+          <span className="font-semibold text-primary-700">Repertório do Dia</span>
+          <span className="text-xs text-primary-600">Selecione as cifras para usar</span>
         </Link>
+
         <Link
           href="/biblioteca"
-          className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex flex-col items-center gap-3 p-6 bg-white border border-gray-200 rounded-xl hover:shadow-md transition-all"
         >
-          Minha Biblioteca
+          <Library className="w-8 h-8 text-gray-600" />
+          <span className="font-semibold text-gray-700">Biblioteca</span>
+          <span className="text-xs text-gray-500">{count || 0} cifras disponíveis</span>
         </Link>
-      </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {cifras?.map((cifra) => (
-          <Link
-            key={cifra.id}
-            href={`/cifras/${cifra.id}`}
-            className="block p-6 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
-          >
-            <h3 className="font-semibold text-gray-900 truncate">
-              {cifra.title}
-            </h3>
-            <p className="text-sm text-gray-500 mt-1">{cifra.artist}</p>
-            {cifra.tom && (
-              <span className="mt-3 inline-block px-2 py-1 text-xs font-medium bg-primary-100 text-primary-700 rounded">
-                Tom: {cifra.tom}
-              </span>
-            )}
-          </Link>
-        ))}
-
-        {(!cifras || cifras.length === 0) && (
-          <div className="col-span-full text-center py-12 text-gray-500">
-            <p>Nenhuma cifra encontrada.</p>
-            <Link href="/cifras/nova" className="text-primary-600 hover:underline mt-2 inline-block">
-              Adicione sua primeira cifra
-            </Link>
-          </div>
-        )}
+        <Link
+          href="/cifras/nova"
+          className="flex flex-col items-center gap-3 p-6 bg-white border border-gray-200 rounded-xl hover:shadow-md transition-all"
+        >
+          <PlusCircle className="w-8 h-8 text-gray-600" />
+          <span className="font-semibold text-gray-700">Nova Cifra</span>
+          <span className="text-xs text-gray-500">Adicionar manualmente</span>
+        </Link>
       </div>
     </div>
   )
