@@ -2,6 +2,8 @@
 
 import { useState, useRef } from 'react'
 import { transposeContent } from '@/utils/transpose'
+import { isChordLine } from '@/utils/chord-detection'
+import { isSectionLine } from '@/utils/section-detection'
 import { NOTES } from '@/types'
 import { Minus, Plus, Printer, RotateCcw } from 'lucide-react'
 
@@ -29,25 +31,36 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
   // Render content with section highlighting
   function renderContent(text: string) {
     const lines = text.split('\n')
+    let inRefrao = false
+
     return lines.map((line, i) => {
       // Detect section headers like [Verso], [Refrão], [INTRO], etc.
       const sectionMatch = line.match(/^\s*\[([^\]]+)\]\s*(.*)$/)
       if (sectionMatch) {
+        inRefrao = /refrão|refrao|coro/i.test(sectionMatch[1])
         return (
           <div key={i} className="section-header mt-4 mb-1">
             <span className="inline-block px-2 py-0.5 bg-primary-100 text-primary-700 text-xs font-bold rounded uppercase tracking-wide">
               {sectionMatch[1]}
             </span>
-            {sectionMatch[2] && <span className="ml-2">{sectionMatch[2]}</span>}
+            {sectionMatch[2] && <span className="ml-2 text-primary-600 font-bold">{sectionMatch[2]}</span>}
           </div>
         )
       }
 
-      // Detect if line is mostly chords (has many uppercase single letters with # or b)
-      const chordPattern = /^[\s]*([A-G][#b]?[m]?[0-9]?(?:sus|dim|aug|maj|add|\/[A-G][#b]?)?[\s]*)+$/
-      const isChordLine = chordPattern.test(line) && line.trim().length > 0
+      // Detect section keywords WITHOUT brackets (INSTRUMENTAL 2x, 4x[PONTE], INTERLÚDIO, etc.)
+      if (isSectionLine(line)) {
+        inRefrao = /refrão|refrao|coro/i.test(line)
+        return (
+          <div key={i} className="section-header mt-4 mb-1 text-primary-600 font-bold whitespace-pre">
+            {line}
+          </div>
+        )
+      }
 
-      if (isChordLine) {
+      // Detect chord lines using shared utility
+      const trimmed = line.trim()
+      if (trimmed.length > 0 && isChordLine(line)) {
         return (
           <div key={i} className="chord-line text-primary-600 font-bold whitespace-pre">
             {line}
@@ -55,9 +68,15 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
         )
       }
 
+      // Empty line
+      if (trimmed.length === 0) {
+        return <div key={i} className="whitespace-pre">{'\u00A0'}</div>
+      }
+
+      // Text line: bold if inside refrão section
       return (
-        <div key={i} className="whitespace-pre">
-          {line || '\u00A0'}
+        <div key={i} className={`whitespace-pre text-gray-900 ${inRefrao ? 'font-bold' : ''}`}>
+          {line}
         </div>
       )
     })

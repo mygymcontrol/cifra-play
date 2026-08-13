@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Search, Plus, X, GripVertical, Printer, Music } from 'lucide-react'
-import { CifraViewer } from '@/components/cifra/CifraViewer'
+import { CifraEditor } from '@/components/cifra/CifraEditor'
 import type { Cifra } from '@/types'
 
 interface SelectedCifra {
   cifra: Cifra
   customTom: string | null
+  customContent: string | null  // versão editada (null = usar original)
+  sectionRepeats: Record<number, number>  // repetições de seção
 }
 
 export default function RepertorioPage() {
@@ -51,7 +53,7 @@ export default function RepertorioPage() {
 
   function addCifra(cifra: Cifra) {
     if (selected.some((s) => s.cifra.id === cifra.id)) return
-    const newSelected = [...selected, { cifra, customTom: cifra.tom }]
+    const newSelected = [...selected, { cifra, customTom: cifra.tom, customContent: null, sectionRepeats: {} }]
     saveRepertorio(newSelected)
     setShowSearch(false)
     setSearch('')
@@ -65,6 +67,20 @@ export default function RepertorioPage() {
   function updateTom(id: string, tom: string) {
     const newSelected = selected.map((s) =>
       s.cifra.id === id ? { ...s, customTom: tom } : s
+    )
+    saveRepertorio(newSelected)
+  }
+
+  function updateContent(id: string, newContent: string) {
+    const newSelected = selected.map((s) =>
+      s.cifra.id === id ? { ...s, customContent: newContent } : s
+    )
+    saveRepertorio(newSelected)
+  }
+
+  function updateSectionRepeats(id: string, repeats: Record<number, number>) {
+    const newSelected = selected.map((s) =>
+      s.cifra.id === id ? { ...s, sectionRepeats: repeats } : s
     )
     saveRepertorio(newSelected)
   }
@@ -111,12 +127,30 @@ export default function RepertorioPage() {
         >
           ← Voltar ao repertório
         </button>
-        <CifraViewer
-          content={viewingCifra.cifra.content}
-          originalTom={viewingCifra.cifra.tom}
+        <CifraEditor
+          content={viewingCifra.customContent || viewingCifra.cifra.content}
+          originalContent={viewingCifra.cifra.content}
+          originalTom={viewingCifra.customTom || viewingCifra.cifra.tom}
           title={viewingCifra.cifra.title}
           artist={viewingCifra.cifra.artist}
+          sectionRepeats={viewingCifra.sectionRepeats}
+          onSave={(newContent) => {
+            updateContent(viewingCifra.cifra.id, newContent)
+            setViewingCifra({ ...viewingCifra, customContent: newContent })
+          }}
+          onRestore={() => {
+            updateContent(viewingCifra.cifra.id, viewingCifra.cifra.content)
+            setViewingCifra({ ...viewingCifra, customContent: null, sectionRepeats: {} })
+            updateSectionRepeats(viewingCifra.cifra.id, {})
+          }}
+          onSectionRepeatsChange={(repeats) => {
+            updateSectionRepeats(viewingCifra.cifra.id, repeats)
+            setViewingCifra({ ...viewingCifra, sectionRepeats: repeats })
+          }}
         />
+        <p className="text-xs text-gray-400 mt-3 no-print">
+          💡 As edições são salvas apenas neste repertório. A cifra original não é alterada.
+        </p>
       </div>
     )
   }
@@ -182,6 +216,11 @@ export default function RepertorioPage() {
               >
                 <h3 className="font-medium text-sm text-gray-900 truncate">
                   {item.cifra.title}
+                  {item.customContent && (
+                    <span className="ml-1.5 text-[10px] px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded">
+                      editada
+                    </span>
+                  )}
                 </h3>
                 <p className="text-xs text-gray-500">{item.cifra.artist}</p>
               </div>
