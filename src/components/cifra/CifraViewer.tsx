@@ -156,7 +156,7 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
       {/* Conteúdo da cifra (A4 printable) */}
       <div
         ref={printRef}
-        className="cifra-sheet bg-white rounded-lg border border-gray-200 overflow-x-auto"
+        className="cifra-sheet bg-white sm:rounded-lg sm:border border-gray-200"
       >
         {/* Header da cifra (aparece na impressão) */}
         {(title || artist) && (
