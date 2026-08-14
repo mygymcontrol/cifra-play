@@ -34,6 +34,9 @@ export default function LoginPage() {
 
   return (
     <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+      <div className="flex justify-center mb-6">
+        <img src="/icon-cifra-play.png" alt="Cifra Play" className="w-20 h-20 rounded-2xl" />
+      </div>
       <h1 className="text-2xl font-bold text-center text-gray-900 mb-6">
         Entrar no Cifra Play
       </h1>
