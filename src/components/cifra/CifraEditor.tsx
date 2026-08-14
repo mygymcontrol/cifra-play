@@ -5,6 +5,7 @@ import { Minus, Plus, Printer, RotateCcw, Pencil, Eye, Save, Undo2, Palette } fr
 import { transposeContent } from '@/utils/transpose'
 import { isChordLine } from '@/utils/chord-detection'
 import { isSectionLine } from '@/utils/section-detection'
+import { normalizeChordSpacing } from '@/utils/chord-align'
 import { NOTES } from '@/types'
 
 const CHORD_COLORS = {
@@ -39,7 +40,8 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
   const [activeRepeatLine, setActiveRepeatLine] = useState<number | null>(null)
   const [lastFocusedLine, setLastFocusedLine] = useState<number | null>(null)
 
-  const displayContent = transposeContent(editing ? editContent : content, transpose)
+  const rawContent = editing ? editContent : content
+  const displayContent = normalizeChordSpacing(transposeContent(rawContent, transpose))
   const currentTom = originalTom
     ? NOTES[(NOTES.indexOf(originalTom as any) + transpose + 12) % 12]
     : null

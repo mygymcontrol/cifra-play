@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { transposeContent } from '@/utils/transpose'
 import { isChordLine } from '@/utils/chord-detection'
 import { isSectionLine } from '@/utils/section-detection'
+import { normalizeChordSpacing } from '@/utils/chord-align'
 import { NOTES } from '@/types'
 import { Minus, Plus, Printer, RotateCcw } from 'lucide-react'
 
@@ -20,8 +21,8 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
   const printRef = useRef<HTMLDivElement>(null)
 
   const displayContent = transpose === 0 
-    ? content 
-    : transposeContent(content, transpose)
+    ? normalizeChordSpacing(content) 
+    : normalizeChordSpacing(transposeContent(content, transpose))
   const currentTom = originalTom
     ? NOTES[(NOTES.indexOf(originalTom as any) + transpose + 12) % 12]
     : null
