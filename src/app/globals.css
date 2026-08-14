@@ -51,6 +51,7 @@
   tab-size: 8;
   -moz-tab-size: 8;
   overflow-x: auto;
+  color: #000000;
 }
 
 :is(.dark) .cifra-content {
