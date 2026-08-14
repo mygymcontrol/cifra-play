@@ -203,14 +203,25 @@ export default function RepertorioPage() {
   function goToNext() {
     if (viewingIndex !== null && viewingIndex < selected.length - 1) {
       setViewingIndex(viewingIndex + 1)
-      window.scrollTo(0, 0)
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'instant' })
+        // Reset horizontal scroll
+        if (swipeRef.current) swipeRef.current.scrollLeft = 0
+        const cifraEl = document.querySelector('.cifra-content')
+        if (cifraEl) cifraEl.scrollLeft = 0
+      }, 0)
     }
   }
 
   function goToPrev() {
     if (viewingIndex !== null && viewingIndex > 0) {
       setViewingIndex(viewingIndex - 1)
-      window.scrollTo(0, 0)
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'instant' })
+        if (swipeRef.current) swipeRef.current.scrollLeft = 0
+        const cifraEl = document.querySelector('.cifra-content')
+        if (cifraEl) cifraEl.scrollLeft = 0
+      }, 0)
     }
   }
 
