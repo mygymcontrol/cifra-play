@@ -246,14 +246,19 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
         )
       } else if (isSectionLine(line)) {
         const repeat = sectionRepeats[i]
+        const sectionNameMatch = line.trim().match(/^(\d+x\s*)?(\[?(?:INTRO|INTRODUÇÃO|VERSO|PRÉ-REFRÃO|PRE-REFRÃO|REFRÃO|PONTE|BRIDGE|SOLO|INTERLÚDIO|INTERLUDIO|INSTRUMENTAL|FINAL|CODA|OUTR[OA]|CORO|RAMPA|PRIMEIRA PARTE|SEGUNDA PARTE|TERCEIRA PARTE)\]?)\s*(.*)$/i)
+        const sectionLabel = sectionNameMatch ? (sectionNameMatch[1] || '') + sectionNameMatch[2].replace(/[\[\]]/g, '') : line.trim()
+        const sectionRest = sectionNameMatch ? sectionNameMatch[3] : ''
         element = (
           <div key={i} className="section-header mt-2 mb-0.5 relative inline-block">
             <span
-              className={`${color.class} font-bold whitespace-pre cursor-pointer hover:opacity-80`}
+              className={`inline-flex items-center gap-1 px-2 py-0.5 ${color.bg} ${color.bgText} text-xs font-bold rounded uppercase tracking-wide cursor-pointer hover:opacity-80`}
               onClick={() => setActiveRepeatLine(activeRepeatLine === i ? null : i)}
             >
-              {repeat ? `${repeat}x ` : ''}{line.trim()}
+              {repeat && <span>{repeat}x</span>}
+              {sectionLabel}
             </span>
+            {sectionRest && <span className={`ml-1 ${color.class} font-bold`}>{sectionRest}</span>}
             {activeRepeatLine === i && (
               <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-1.5 z-20 flex gap-1 flex-wrap no-print">
                 <button onClick={() => setRepeat(i, null)} className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${!repeat ? 'bg-gray-200 font-bold' : 'hover:bg-gray-100'}`}>—</button>

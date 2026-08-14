@@ -88,11 +88,27 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
           </div>
         )
       } else if (isSectionLine(line)) {
-        element = (
-          <div key={i} className="section-header mt-2 mb-0.5 text-primary-600 font-bold whitespace-pre">
-            {line}
-          </div>
-        )
+        // Extrair o nome da seção e o resto (acordes após o nome)
+        const sectionNameMatch = line.trim().match(/^(\d+x\s*)?(\[?(?:INTRO|INTRODUÇÃO|VERSO|PRÉ-REFRÃO|PRE-REFRÃO|REFRÃO|PONTE|BRIDGE|SOLO|INTERLÚDIO|INTERLUDIO|INSTRUMENTAL|FINAL|CODA|OUTR[OA]|CORO|RAMPA|PRIMEIRA PARTE|SEGUNDA PARTE|TERCEIRA PARTE)\]?)\s*(.*)$/i)
+        if (sectionNameMatch) {
+          const prefix = sectionNameMatch[1] || ''
+          const sectionName = sectionNameMatch[2].replace(/[\[\]]/g, '')
+          const rest = sectionNameMatch[3]
+          element = (
+            <div key={i} className="section-header mt-2 mb-0.5">
+              <span className="inline-block px-2 py-0.5 bg-primary-100 text-primary-700 text-xs font-bold rounded uppercase tracking-wide">
+                {prefix}{sectionName}
+              </span>
+              {rest && <span className="ml-2 text-primary-600 font-bold">{rest}</span>}
+            </div>
+          )
+        } else {
+          element = (
+            <div key={i} className="section-header mt-2 mb-0.5 text-primary-600 font-bold whitespace-pre">
+              {line}
+            </div>
+          )
+        }
       } else if (trimmed.length > 0 && isChordLine(line)) {
         element = (
           <div key={i} className="chord-line text-primary-600 font-bold whitespace-pre">
