@@ -274,7 +274,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
         element = <div key={i} className="whitespace-pre">{'\u00A0'}</div>
       } else {
         element = (
-          <div key={i} className={`whitespace-pre text-gray-900 ${lineIsRefrao ? 'font-bold' : ''}`}>
+          <div key={i} className={`whitespace-pre text-gray-900 dark:text-gray-100 ${lineIsRefrao ? 'font-bold' : ''}`}>
             {line}
           </div>
         )
@@ -300,23 +300,23 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
   return (
     <div>
       {/* Controles */}
-      <div className="flex flex-wrap items-center gap-3 mb-4 p-3 bg-gray-100 rounded-lg no-print">
+      <div className="flex flex-wrap items-center gap-3 mb-4 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg no-print">
         {/* Tom */}
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-700">Tom:</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Tom:</span>
           {currentTom && (
             <span className={`text-sm font-bold ${color.class}`}>{currentTom}</span>
           )}
           <button
             onClick={() => setTranspose((t) => t - 1)}
-            className="w-7 h-7 flex items-center justify-center rounded bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+            className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 hover:bg-gray-50"
             aria-label="Diminuir tom"
           >
             <Minus className="w-3 h-3" />
           </button>
           <button
             onClick={() => setTranspose((t) => t + 1)}
-            className="w-7 h-7 flex items-center justify-center rounded bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+            className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 hover:bg-gray-50"
             aria-label="Aumentar tom"
           >
             <Plus className="w-3 h-3" />
@@ -336,10 +336,10 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
 
         {/* Fonte */}
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-700">Fonte:</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Fonte:</span>
           <button
             onClick={() => setFontSize((s) => Math.max(10, s - 1))}
-            className="w-7 h-7 flex items-center justify-center rounded bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+            className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 hover:bg-gray-50"
             aria-label="Diminuir fonte"
           >
             <span className="text-xs font-bold">A-</span>
@@ -347,7 +347,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
           <span className="text-xs font-medium w-6 text-center">{fontSize}</span>
           <button
             onClick={() => setFontSize((s) => Math.min(24, s + 1))}
-            className="w-7 h-7 flex items-center justify-center rounded bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+            className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 hover:bg-gray-50"
             aria-label="Aumentar fonte"
           >
             <span className="text-xs font-bold">A+</span>
@@ -360,7 +360,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
         <div className="relative">
           <button
             onClick={() => setShowColorPicker(!showColorPicker)}
-            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 transition-colors"
             aria-label="Cor da cifra"
           >
             <Palette className="w-3.5 h-3.5" />
@@ -387,7 +387,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
         {!editing ? (
           <button
             onClick={() => setEditing(true)}
-            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 transition-colors"
           >
             <Pencil className="w-3.5 h-3.5" />
             <span>Editar</span>
@@ -403,7 +403,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
             </button>
             <button
               onClick={handleCancel}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 transition-colors"
             >
               <Eye className="w-3.5 h-3.5" />
               <span>Cancelar</span>
@@ -430,7 +430,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
         {/* Imprimir */}
         <button
           onClick={handlePrint}
-          className="flex items-center gap-1 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+          className="flex items-center gap-1 px-3 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 transition-colors"
         >
           <Printer className="w-4 h-4" />
           <span className="hidden sm:inline">Imprimir</span>
@@ -458,9 +458,9 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
       {/* Conteúdo */}
       <div className="cifra-sheet bg-white dark:bg-gray-800 sm:rounded-lg sm:border border-gray-200 dark:border-gray-700">
         {(title || artist) && (
-          <div className="cifra-header mb-3 pb-2 border-b border-gray-200">
-            {title && <h2 className="text-lg font-bold text-gray-900">{title}</h2>}
-            <div className="flex gap-4 text-sm text-gray-600">
+          <div className="cifra-header mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
+            {title && <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">{title}</h2>}
+            <div className="flex gap-4 text-sm text-gray-600 dark:text-gray-400">
               {artist && <span>{artist}</span>}
               {currentTom && <span>Tom: {currentTom}</span>}
             </div>
