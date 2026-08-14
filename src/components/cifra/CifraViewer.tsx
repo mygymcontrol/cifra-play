@@ -28,58 +28,77 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
     window.print()
   }
 
-  // Render content with section highlighting
+  // Render content with section highlighting - groups refrão lines in a wrapper
   function renderContent(text: string) {
     const lines = text.split('\n')
     let inRefrao = false
+    
+    // Build groups: each group is { isRefrao: boolean, elements: JSX[] }
+    const groups: { isRefrao: boolean; elements: React.ReactNode[] }[] = []
+    let currentGroup: { isRefrao: boolean; elements: React.ReactNode[] } = { isRefrao: false, elements: [] }
 
-    return lines.map((line, i) => {
-      // Detect section headers like [Verso], [Refrão], [INTRO], etc.
+    lines.forEach((line, i) => {
+      const trimmed = line.trim()
+      let element: React.ReactNode
+      let newRefrao = inRefrao
+
+      // Detect section headers
       const sectionMatch = line.match(/^\s*\[([^\]]+)\]\s*(.*)$/)
       if (sectionMatch) {
-        inRefrao = /refrão|refrao|coro/i.test(sectionMatch[1])
-        return (
-          <div key={i} className={`section-header mt-2 mb-0.5 ${inRefrao ? 'refrao-bg -mx-2 px-2 pt-1' : ''}`}>
+        newRefrao = /refrão|refrao|coro/i.test(sectionMatch[1])
+        element = (
+          <div key={i} className="section-header mt-2 mb-0.5">
             <span className="inline-block px-2 py-0.5 bg-primary-100 text-primary-700 text-xs font-bold rounded uppercase tracking-wide">
               {sectionMatch[1]}
             </span>
             {sectionMatch[2] && <span className="ml-2 text-primary-600 font-bold">{sectionMatch[2]}</span>}
           </div>
         )
-      }
-
-      // Detect section keywords WITHOUT brackets (INSTRUMENTAL 2x, 4x[PONTE], INTERLÚDIO, etc.)
-      if (isSectionLine(line)) {
-        inRefrao = /refrão|refrao|coro/i.test(line)
-        return (
-          <div key={i} className={`section-header mt-2 mb-0.5 text-primary-600 font-bold whitespace-pre ${inRefrao ? 'refrao-bg -mx-2 px-2 pt-1' : ''}`}>
+      } else if (isSectionLine(line)) {
+        newRefrao = /refrão|refrao|coro/i.test(line)
+        element = (
+          <div key={i} className="section-header mt-2 mb-0.5 text-primary-600 font-bold whitespace-pre">
+            {line}
+          </div>
+        )
+      } else if (trimmed.length > 0 && isChordLine(line)) {
+        element = (
+          <div key={i} className="chord-line text-primary-600 font-bold whitespace-pre">
+            {line}
+          </div>
+        )
+      } else if (trimmed.length === 0) {
+        element = <div key={i} className="whitespace-pre">{'\u00A0'}</div>
+      } else {
+        element = (
+          <div key={i} className={`whitespace-pre text-gray-900 ${inRefrao ? 'font-bold' : ''}`}>
             {line}
           </div>
         )
       }
 
-      // Detect chord lines using shared utility
-      const trimmed = line.trim()
-      if (trimmed.length > 0 && isChordLine(line)) {
-        return (
-          <div key={i} className={`chord-line text-primary-600 font-bold whitespace-pre ${inRefrao ? 'refrao-bg -mx-2 px-2' : ''}`}>
-            {line}
-          </div>
-        )
+      // If refrão state changed, start new group
+      if (newRefrao !== inRefrao) {
+        if (currentGroup.elements.length > 0) {
+          groups.push(currentGroup)
+        }
+        currentGroup = { isRefrao: newRefrao, elements: [element] }
+        inRefrao = newRefrao
+      } else {
+        currentGroup.elements.push(element)
       }
-
-      // Empty line
-      if (trimmed.length === 0) {
-        return <div key={i} className={`whitespace-pre ${inRefrao ? 'refrao-bg -mx-2 px-2' : ''}`}>{'\u00A0'}</div>
-      }
-
-      // Text line: bold if inside refrão section
-      return (
-        <div key={i} className={`whitespace-pre text-gray-900 ${inRefrao ? 'font-bold refrao-bg -mx-2 px-2' : ''}`}>
-          {line}
-        </div>
-      )
     })
+
+    // Push last group
+    if (currentGroup.elements.length > 0) {
+      groups.push(currentGroup)
+    }
+
+    return groups.map((group, gi) => (
+      <div key={gi} className={group.isRefrao ? 'refrao-bg' : ''}>
+        {group.elements}
+      </div>
+    ))
   }
 
   return (

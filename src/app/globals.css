@@ -77,15 +77,13 @@
   }
 }
 
-/* Fundo do refrão - preenche toda a largura */
+/* Fundo do refrão - wrapper que preenche toda a largura */
 .refrao-bg {
   background-color: rgba(239, 68, 68, 0.06);
   margin-left: -16px;
   margin-right: -16px;
   padding-left: 16px;
   padding-right: 16px;
-  display: block;
-  min-width: calc(100% + 32px);
 }
 
 @media (min-width: 640px) {
@@ -94,7 +92,6 @@
     margin-right: -24px;
     padding-left: 24px;
     padding-right: 24px;
-    min-width: calc(100% + 48px);
   }
 }
 
