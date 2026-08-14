@@ -32,6 +32,7 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
   function renderContent(text: string) {
     const lines = text.split('\n')
     let inRefrao = false
+    let prevWasEmpty = false
     
     // Build groups: each group is { isRefrao: boolean, elements: JSX[] }
     const groups: { isRefrao: boolean; elements: React.ReactNode[] }[] = []
@@ -41,6 +42,20 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
       const trimmed = line.trim()
       let element: React.ReactNode
       let newRefrao = inRefrao
+
+      // Skip consecutive empty lines (only keep 1)
+      if (trimmed.length === 0) {
+        if (prevWasEmpty) return
+        prevWasEmpty = true
+        // 2+ empty lines break refrão
+        const nextLine = lines[i + 1]
+        if (nextLine !== undefined && nextLine.trim().length === 0) {
+          inRefrao = false
+          newRefrao = false
+        }
+      } else {
+        prevWasEmpty = false
+      }
 
       // Detect section headers
       const sectionMatch = line.match(/^\s*\[([^\]]+)\]\s*(.*)$/)
