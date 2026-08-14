@@ -188,17 +188,46 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
   // Render content with section highlighting
   function renderContent(text: string) {
     const lines = text.split('\n')
-    let inRefrao = false
-
-    return lines.map((line, i) => {
+    
+    // PASSO 1: Determinar quais linhas pertencem ao refrão
+    const isRefraoArr: boolean[] = new Array(lines.length).fill(false)
+    let refrao = false
+    
+    for (let i = 0; i < lines.length; i++) {
+      const isEmpty = !lines[i] || /^\s*$/.test(lines[i])
+      if (isEmpty) { refrao = false; continue }
+      const sm = lines[i].trim().match(/^\[([^\]]+)\]/)
+      if (sm) { refrao = /refrão|refrao|coro/i.test(sm[1]) }
+      else if (isSectionLine(lines[i])) { refrao = /refrão|refrao|coro/i.test(lines[i]) }
+      isRefraoArr[i] = refrao
+    }
+    
+    // PASSO 2: Agrupar e renderizar
+    const groups: { isRefrao: boolean; elements: React.ReactNode[] }[] = []
+    let currentGroup: { isRefrao: boolean; elements: React.ReactNode[] } | null = null
+    let prevWasEmpty = false
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]
+      const trimmed = line.trim()
+      const lineIsRefrao = isRefraoArr[i]
+      
+      if (trimmed.length === 0) {
+        if (prevWasEmpty) continue
+        prevWasEmpty = true
+      } else {
+        prevWasEmpty = false
+      }
+      
+      let element: React.ReactNode
       const sectionMatch = line.match(/^\s*\[([^\]]+)\]\s*(.*)$/)
+      
       if (sectionMatch) {
-        inRefrao = /refrão|refrao|coro/i.test(sectionMatch[1])
         const repeat = sectionRepeats[i]
-        return (
-          <div key={i} className={`section-header mt-2 mb-0.5 relative inline-block ${inRefrao ? 'refrao-bg -mx-2 px-2 pt-1' : ''}`}>
+        element = (
+          <div key={i} className="section-header mt-2 mb-0.5 relative inline-block">
             <span
-              className={`inline-flex items-center gap-1 px-2 py-0.5 ${color.bg} ${color.bgText} text-xs font-bold rounded uppercase tracking-wide cursor-pointer hover:opacity-80 no-print-hover`}
+              className={`inline-flex items-center gap-1 px-2 py-0.5 ${color.bg} ${color.bgText} text-xs font-bold rounded uppercase tracking-wide cursor-pointer hover:opacity-80`}
               onClick={() => setActiveRepeatLine(activeRepeatLine === i ? null : i)}
             >
               {repeat && <span>{repeat}x</span>}
@@ -207,32 +236,18 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
             {sectionMatch[2] && <span className={`ml-1 ${color.class} font-bold`}>{sectionMatch[2]}</span>}
             {activeRepeatLine === i && (
               <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-1.5 z-20 flex gap-1 flex-wrap no-print">
-                <button
-                  onClick={() => setRepeat(i, null)}
-                  className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${!repeat ? 'bg-gray-200 font-bold' : 'hover:bg-gray-100'}`}
-                >
-                  —
-                </button>
+                <button onClick={() => setRepeat(i, null)} className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${!repeat ? 'bg-gray-200 font-bold' : 'hover:bg-gray-100'}`}>—</button>
                 {[1,2,3,4,5,6,7,8,9,10].map(n => (
-                  <button
-                    key={n}
-                    onClick={() => setRepeat(i, n)}
-                    className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${repeat === n ? `${color.bg} ${color.bgText} font-bold` : 'hover:bg-gray-100'}`}
-                  >
-                    {n}x
-                  </button>
+                  <button key={n} onClick={() => setRepeat(i, n)} className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${repeat === n ? `${color.bg} ${color.bgText} font-bold` : 'hover:bg-gray-100'}`}>{n}x</button>
                 ))}
               </div>
             )}
           </div>
         )
-      }
-
-      if (isSectionLine(line)) {
-        inRefrao = /refrão|refrao|coro/i.test(line)
+      } else if (isSectionLine(line)) {
         const repeat = sectionRepeats[i]
-        return (
-          <div key={i} className={`section-header mt-2 mb-0.5 relative inline-block ${inRefrao ? 'refrao-bg -mx-2 px-2 pt-1' : ''}`}>
+        element = (
+          <div key={i} className="section-header mt-2 mb-0.5 relative inline-block">
             <span
               className={`${color.class} font-bold whitespace-pre cursor-pointer hover:opacity-80`}
               onClick={() => setActiveRepeatLine(activeRepeatLine === i ? null : i)}
@@ -241,46 +256,45 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
             </span>
             {activeRepeatLine === i && (
               <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-1.5 z-20 flex gap-1 flex-wrap no-print">
-                <button
-                  onClick={() => setRepeat(i, null)}
-                  className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${!repeat ? 'bg-gray-200 font-bold' : 'hover:bg-gray-100'}`}
-                >
-                  —
-                </button>
+                <button onClick={() => setRepeat(i, null)} className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${!repeat ? 'bg-gray-200 font-bold' : 'hover:bg-gray-100'}`}>—</button>
                 {[1,2,3,4,5,6,7,8,9,10].map(n => (
-                  <button
-                    key={n}
-                    onClick={() => setRepeat(i, n)}
-                    className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${repeat === n ? `${color.bg} ${color.bgText} font-bold` : 'hover:bg-gray-100'}`}
-                  >
-                    {n}x
-                  </button>
+                  <button key={n} onClick={() => setRepeat(i, n)} className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${repeat === n ? `${color.bg} ${color.bgText} font-bold` : 'hover:bg-gray-100'}`}>{n}x</button>
                 ))}
               </div>
             )}
           </div>
         )
-      }
-
-      const trimmed = line.trim()
-      if (trimmed.length > 0 && isChordLine(line)) {
-        return (
-          <div key={i} className={`chord-line ${color.class} font-bold whitespace-pre ${inRefrao ? 'refrao-bg -mx-2 px-2' : ''}`}>
+      } else if (trimmed.length > 0 && isChordLine(line)) {
+        element = (
+          <div key={i} className={`chord-line ${color.class} font-bold whitespace-pre`}>
+            {line}
+          </div>
+        )
+      } else if (trimmed.length === 0) {
+        element = <div key={i} className="whitespace-pre">{'\u00A0'}</div>
+      } else {
+        element = (
+          <div key={i} className={`whitespace-pre text-gray-900 ${lineIsRefrao ? 'font-bold' : ''}`}>
             {line}
           </div>
         )
       }
-
-      if (trimmed.length === 0) {
-        return <div key={i} className={`whitespace-pre ${inRefrao ? 'refrao-bg -mx-2 px-2' : ''}`}>{'\u00A0'}</div>
+      
+      if (!currentGroup || currentGroup.isRefrao !== lineIsRefrao) {
+        if (currentGroup) groups.push(currentGroup)
+        currentGroup = { isRefrao: lineIsRefrao, elements: [element] }
+      } else {
+        currentGroup.elements.push(element)
       }
-
-      return (
-        <div key={i} className={`whitespace-pre text-gray-900 ${inRefrao ? 'font-bold refrao-bg -mx-2 px-2' : ''}`}>
-          {line}
-        </div>
-      )
-    })
+    }
+    
+    if (currentGroup) groups.push(currentGroup)
+    
+    return groups.map((group, gi) => (
+      <div key={gi} className={group.isRefrao ? 'refrao-bg' : ''}>
+        {group.elements}
+      </div>
+    ))
   }
 
   return (
