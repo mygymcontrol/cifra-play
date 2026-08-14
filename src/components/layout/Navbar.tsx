@@ -14,7 +14,7 @@ export function Navbar() {
 
   useEffect(() => {
     const saved = localStorage.getItem('cifra-play-dark')
-    if (saved !== 'false') {
+    if (saved === 'true') {
       setDark(true)
       document.documentElement.classList.add('dark')
     }

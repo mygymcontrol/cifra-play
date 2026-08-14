@@ -39,14 +39,14 @@ export default function RegistroPage() {
   }
 
   return (
-    <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
-      <h1 className="text-2xl font-bold text-center text-gray-900 mb-6">
+    <div className="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700">
+      <h1 className="text-2xl font-bold text-center text-white mb-6">
         Criar Conta
       </h1>
 
       <form onSubmit={handleRegister} className="space-y-4">
         <div>
-          <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-1">
             Nome completo
           </label>
           <input
@@ -55,13 +55,13 @@ export default function RegistroPage() {
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder-gray-400"
             placeholder="Seu nome"
           />
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
             Email
           </label>
           <input
@@ -70,13 +70,13 @@ export default function RegistroPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder-gray-400"
             placeholder="seu@email.com"
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
             Senha
           </label>
           <input
@@ -86,13 +86,13 @@ export default function RegistroPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder-gray-400"
             placeholder="Mínimo 6 caracteres"
           />
         </div>
 
         {error && (
-          <p className="text-sm text-red-600" role="alert">{error}</p>
+          <p className="text-sm text-red-400" role="alert">{error}</p>
         )}
 
         <button
@@ -104,9 +104,9 @@ export default function RegistroPage() {
         </button>
       </form>
 
-      <p className="mt-4 text-center text-sm text-gray-600">
+      <p className="mt-4 text-center text-sm text-gray-400">
         Já tem conta?{' '}
-        <Link href="/login" className="text-primary-600 hover:underline">
+        <Link href="/login" className="text-primary-400 hover:underline">
           Entrar
         </Link>
       </p>
