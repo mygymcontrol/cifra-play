@@ -42,6 +42,8 @@
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word;
+  width: 100%;
+  position: relative;
 }
 
 .cifra-content .chord-line {
@@ -50,6 +52,7 @@
 
 .cifra-sheet {
   padding: 16px;
+  position: relative;
 }
 
 @media (min-width: 640px) {
