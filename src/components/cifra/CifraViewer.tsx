@@ -42,12 +42,12 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
       const trimmed = line.trim()
       let element: React.ReactNode
       let newRefrao = inRefrao
+      let wasInRefrao = inRefrao
 
       // Handle empty lines
       if (trimmed.length === 0) {
         // Any empty line breaks refrão
         if (inRefrao) {
-          inRefrao = false
           newRefrao = false
         }
         // Skip consecutive empty lines (only keep 1)
