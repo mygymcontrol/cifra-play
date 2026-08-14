@@ -28,39 +28,57 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
     window.print()
   }
 
-  // Render content with section highlighting - groups refrão lines in a wrapper
+  // Render content with section highlighting
   function renderContent(text: string) {
     const lines = text.split('\n')
+    
+    // PASSO 1: Determinar quais linhas pertencem ao refrão
+    const isRefraoLine: boolean[] = new Array(lines.length).fill(false)
     let inRefrao = false
+    
+    for (let i = 0; i < lines.length; i++) {
+      const trimmed = lines[i].trim()
+      
+      // Linha vazia = encerra refrão
+      if (trimmed.length === 0) {
+        inRefrao = false
+        continue
+      }
+      
+      // Marcador de seção
+      const sectionMatch = trimmed.match(/^\[([^\]]+)\]/)
+      if (sectionMatch) {
+        inRefrao = /refrão|refrao|coro/i.test(sectionMatch[1])
+      } else if (isSectionLine(lines[i])) {
+        inRefrao = /refrão|refrao|coro/i.test(lines[i])
+      }
+      
+      isRefraoLine[i] = inRefrao
+    }
+    
+    // PASSO 2: Agrupar linhas consecutivas com mesmo estado de refrão
+    const groups: { isRefrao: boolean; elements: React.ReactNode[] }[] = []
+    let currentGroup: { isRefrao: boolean; elements: React.ReactNode[] } | null = null
     let prevWasEmpty = false
     
-    // Build groups: each group is { isRefrao: boolean, elements: JSX[] }
-    const groups: { isRefrao: boolean; elements: React.ReactNode[] }[] = []
-    let currentGroup: { isRefrao: boolean; elements: React.ReactNode[] } = { isRefrao: false, elements: [] }
-
-    lines.forEach((line, i) => {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]
       const trimmed = line.trim()
-      let element: React.ReactNode
-      let newRefrao = inRefrao
-      let wasInRefrao = inRefrao
-
-      // Handle empty lines
+      const lineIsRefrao = isRefraoLine[i]
+      
+      // Colapsar linhas vazias consecutivas
       if (trimmed.length === 0) {
-        // Any empty line breaks refrão
-        if (inRefrao) {
-          newRefrao = false
-        }
-        // Skip consecutive empty lines (only keep 1)
-        if (prevWasEmpty) return
+        if (prevWasEmpty) continue
         prevWasEmpty = true
       } else {
         prevWasEmpty = false
       }
-
-      // Detect section headers
+      
+      // Criar elemento
+      let element: React.ReactNode
       const sectionMatch = line.match(/^\s*\[([^\]]+)\]\s*(.*)$/)
+      
       if (sectionMatch) {
-        newRefrao = /refrão|refrao|coro/i.test(sectionMatch[1])
         element = (
           <div key={i} className="section-header mt-2 mb-0.5">
             <span className="inline-block px-2 py-0.5 bg-primary-100 text-primary-700 text-xs font-bold rounded uppercase tracking-wide">
@@ -70,7 +88,6 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
           </div>
         )
       } else if (isSectionLine(line)) {
-        newRefrao = /refrão|refrao|coro/i.test(line)
         element = (
           <div key={i} className="section-header mt-2 mb-0.5 text-primary-600 font-bold whitespace-pre">
             {line}
@@ -86,29 +103,23 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
         element = <div key={i} className="whitespace-pre">{'\u00A0'}</div>
       } else {
         element = (
-          <div key={i} className={`whitespace-pre text-gray-900 ${inRefrao ? 'font-bold' : ''}`}>
+          <div key={i} className={`whitespace-pre text-gray-900 ${lineIsRefrao ? 'font-bold' : ''}`}>
             {line}
           </div>
         )
       }
-
-      // If refrão state changed, start new group
-      if (newRefrao !== inRefrao) {
-        if (currentGroup.elements.length > 0) {
-          groups.push(currentGroup)
-        }
-        currentGroup = { isRefrao: newRefrao, elements: [element] }
-        inRefrao = newRefrao
+      
+      // Agrupar
+      if (!currentGroup || currentGroup.isRefrao !== lineIsRefrao) {
+        if (currentGroup) groups.push(currentGroup)
+        currentGroup = { isRefrao: lineIsRefrao, elements: [element] }
       } else {
         currentGroup.elements.push(element)
       }
-    })
-
-    // Push last group
-    if (currentGroup.elements.length > 0) {
-      groups.push(currentGroup)
     }
-
+    
+    if (currentGroup) groups.push(currentGroup)
+    
     return groups.map((group, gi) => (
       <div key={gi} className={group.isRefrao ? 'refrao-bg' : ''}>
         {group.elements}
