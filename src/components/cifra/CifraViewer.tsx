@@ -19,7 +19,9 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
   const [fontSize, setFontSize] = useState(8)
   const printRef = useRef<HTMLDivElement>(null)
 
-  const displayContent = transposeContent(content, transpose)
+  const displayContent = transpose === 0 
+    ? content 
+    : transposeContent(content, transpose)
   const currentTom = originalTom
     ? NOTES[(NOTES.indexOf(originalTom as any) + transpose + 12) % 12]
     : null
@@ -111,7 +113,7 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
         }
       } else if (trimmed.length > 0 && isChordLine(line)) {
         element = (
-          <div key={i} className="chord-line text-primary-600 whitespace-pre">
+          <div key={i} className="chord-line text-primary-600 font-bold whitespace-pre">
             {line}
           </div>
         )

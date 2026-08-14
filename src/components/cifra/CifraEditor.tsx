@@ -271,7 +271,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
         )
       } else if (trimmed.length > 0 && isChordLine(line)) {
         element = (
-          <div key={i} className={`chord-line ${color.class} whitespace-pre`}>
+          <div key={i} className={`chord-line ${color.class} font-bold whitespace-pre`}>
             {line}
           </div>
         )

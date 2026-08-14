@@ -48,6 +48,9 @@
   font-family: 'Courier New', Courier, monospace;
   white-space: pre;
   width: 100%;
+  tab-size: 8;
+  -moz-tab-size: 8;
+  overflow-x: auto;
 }
 
 :is(.dark) .cifra-content {
@@ -55,7 +58,7 @@
 }
 
 .cifra-content .chord-line {
-  font-weight: 400;
+  font-weight: 700;
 }
 
 .cifra-sheet {
