@@ -47,9 +47,8 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
       if (trimmed.length === 0) {
         if (prevWasEmpty) return
         prevWasEmpty = true
-        // 2+ empty lines break refrão
-        const nextLine = lines[i + 1]
-        if (nextLine !== undefined && nextLine.trim().length === 0) {
+        // Any empty line breaks refrão
+        if (inRefrao) {
           inRefrao = false
           newRefrao = false
         }
