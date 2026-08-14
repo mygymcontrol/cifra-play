@@ -651,6 +651,25 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
                       }`}
                       style={{ fontSize: `${fontSize}px`, lineHeight: '1.3' }}
                     />
+                    {isSection && (
+                      <div className="relative flex items-center ml-1">
+                        <button
+                          onClick={() => setActiveColorLine(activeColorLine === i ? null : i)}
+                          className={`w-5 h-5 rounded-full border-2 border-gray-300 cursor-pointer hover:scale-110 transition-transform shrink-0 ${sectionColors[i] ? '' : 'bg-white'}`}
+                          style={sectionColors[i] ? { backgroundColor: SECTION_BG_COLORS[sectionColors[i]]?.replace('0.08', '0.5') || '' } : {}}
+                          title="Cor de fundo da seção"
+                        />
+                        {activeColorLine === i && (
+                          <div className="absolute top-full right-0 mt-1 bg-white text-gray-900 border border-gray-200 rounded-lg shadow-lg p-2 z-20 flex gap-2 no-print">
+                            <button onClick={() => setSectionColorFn(i, null)} className={`w-7 h-7 rounded-full border-2 ${!sectionColors[i] ? 'border-gray-600 ring-2 ring-offset-1 ring-gray-400' : 'border-gray-300'} bg-white hover:scale-110 transition-transform`} title="Sem cor">✕</button>
+                            <button onClick={() => setSectionColorFn(i, 'red')} className={`w-7 h-7 rounded-full border-2 ${sectionColors[i] === 'red' ? 'ring-2 ring-offset-1 ring-gray-400' : ''} border-red-300 bg-red-100 hover:scale-110 transition-transform`} title="Vermelho" />
+                            <button onClick={() => setSectionColorFn(i, 'green')} className={`w-7 h-7 rounded-full border-2 ${sectionColors[i] === 'green' ? 'ring-2 ring-offset-1 ring-gray-400' : ''} border-green-300 bg-green-100 hover:scale-110 transition-transform`} title="Verde" />
+                            <button onClick={() => setSectionColorFn(i, 'blue')} className={`w-7 h-7 rounded-full border-2 ${sectionColors[i] === 'blue' ? 'ring-2 ring-offset-1 ring-gray-400' : ''} border-blue-300 bg-blue-100 hover:scale-110 transition-transform`} title="Azul" />
+                            <button onClick={() => setSectionColorFn(i, 'yellow')} className={`w-7 h-7 rounded-full border-2 ${sectionColors[i] === 'yellow' ? 'ring-2 ring-offset-1 ring-gray-400' : ''} border-yellow-300 bg-yellow-100 hover:scale-110 transition-transform`} title="Amarelo" />
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               )
