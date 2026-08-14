@@ -16,7 +16,7 @@ interface CifraViewerProps {
 
 export function CifraViewer({ content, originalTom, title, artist }: CifraViewerProps) {
   const [transpose, setTranspose] = useState(0)
-  const [fontSize, setFontSize] = useState(14)
+  const [fontSize, setFontSize] = useState(8)
   const printRef = useRef<HTMLDivElement>(null)
 
   const displayContent = transposeContent(content, transpose)

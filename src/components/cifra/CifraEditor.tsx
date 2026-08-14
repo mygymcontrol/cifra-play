@@ -30,7 +30,7 @@ interface CifraEditorProps {
 
 export function CifraEditor({ content, originalContent, originalTom, title, artist, onSave, onRestore, sectionRepeats: savedRepeats, onSectionRepeatsChange }: CifraEditorProps) {
   const [transpose, setTranspose] = useState(0)
-  const [fontSize, setFontSize] = useState(14)
+  const [fontSize, setFontSize] = useState(8)
   const [editing, setEditing] = useState(false)
   const [editContent, setEditContent] = useState(content)
   const [chordColor, setChordColor] = useState<ChordColor>('blue')
