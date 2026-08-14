@@ -281,7 +281,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
         element = <div key={i} className="whitespace-pre">{'\u00A0'}</div>
       } else {
         element = (
-          <div key={i} className="whitespace-pre text-gray-900 dark:text-gray-100">
+          <div key={i} className={`whitespace-pre text-gray-900 dark:text-gray-100 ${lineIsRefrao ? 'font-bold' : ''}`}>
             {line}
           </div>
         )
