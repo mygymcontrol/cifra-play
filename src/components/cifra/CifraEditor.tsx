@@ -280,12 +280,14 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
             </span>
             {sectionMatch[2] && <span className={`ml-1 ${color.class} font-bold`}>{sectionMatch[2]}</span>}
             {/* Color picker button */}
-            <button
-              onClick={() => setActiveColorLine(activeColorLine === i ? null : i)}
-              className={`w-5 h-5 rounded-full border-2 border-gray-300 cursor-pointer hover:scale-110 transition-transform no-print ${secColor ? '' : 'bg-white'}`}
-              style={secColor ? { backgroundColor: SECTION_BG_COLORS[secColor]?.replace('0.08', '0.5') || '' } : {}}
-              title="Cor de fundo da seção"
-            />
+            {editing && (
+              <button
+                onClick={() => setActiveColorLine(activeColorLine === i ? null : i)}
+                className={`w-5 h-5 rounded-full border-2 border-gray-300 cursor-pointer hover:scale-110 transition-transform no-print ${secColor ? '' : 'bg-white'}`}
+                style={secColor ? { backgroundColor: SECTION_BG_COLORS[secColor]?.replace('0.08', '0.5') || '' } : {}}
+                title="Cor de fundo da seção"
+              />
+            )}
             {activeRepeatLine === i && (
               <div className="absolute top-full left-0 mt-1 bg-white text-gray-900 border border-gray-200 rounded-lg shadow-lg p-1.5 z-20 flex gap-1 flex-wrap no-print">
                 <button onClick={() => setRepeat(i, null)} className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${!repeat ? 'bg-gray-200 font-bold' : 'hover:bg-gray-100'}`}>—</button>
@@ -294,7 +296,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
                 ))}
               </div>
             )}
-            {activeColorLine === i && (
+            {editing && activeColorLine === i && (
               <div className="absolute top-full left-0 mt-1 bg-white text-gray-900 border border-gray-200 rounded-lg shadow-lg p-2 z-20 flex gap-2 no-print">
                 <button onClick={() => setSectionColorFn(i, null)} className={`w-7 h-7 rounded-full border-2 ${!secColor ? 'border-gray-600 ring-2 ring-offset-1 ring-gray-400' : 'border-gray-300'} bg-white hover:scale-110 transition-transform`} title="Sem cor">✕</button>
                 <button onClick={() => setSectionColorFn(i, 'red')} className={`w-7 h-7 rounded-full border-2 ${secColor === 'red' ? 'ring-2 ring-offset-1 ring-gray-400' : ''} border-red-300 bg-red-100 hover:scale-110 transition-transform`} title="Vermelho" />
@@ -322,12 +324,14 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
             </span>
             {sectionRest && <span className={`ml-1 ${color.class} font-bold`}>{sectionRest}</span>}
             {/* Color picker button */}
-            <button
-              onClick={() => setActiveColorLine(activeColorLine === i ? null : i)}
-              className={`w-5 h-5 rounded-full border-2 border-gray-300 cursor-pointer hover:scale-110 transition-transform no-print ${secColor ? '' : 'bg-white'}`}
-              style={secColor ? { backgroundColor: SECTION_BG_COLORS[secColor]?.replace('0.08', '0.5') || '' } : {}}
-              title="Cor de fundo da seção"
-            />
+            {editing && (
+              <button
+                onClick={() => setActiveColorLine(activeColorLine === i ? null : i)}
+                className={`w-5 h-5 rounded-full border-2 border-gray-300 cursor-pointer hover:scale-110 transition-transform no-print ${secColor ? '' : 'bg-white'}`}
+                style={secColor ? { backgroundColor: SECTION_BG_COLORS[secColor]?.replace('0.08', '0.5') || '' } : {}}
+                title="Cor de fundo da seção"
+              />
+            )}
             {activeRepeatLine === i && (
               <div className="absolute top-full left-0 mt-1 bg-white text-gray-900 border border-gray-200 rounded-lg shadow-lg p-1.5 z-20 flex gap-1 flex-wrap no-print">
                 <button onClick={() => setRepeat(i, null)} className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${!repeat ? 'bg-gray-200 font-bold' : 'hover:bg-gray-100'}`}>—</button>
@@ -336,7 +340,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
                 ))}
               </div>
             )}
-            {activeColorLine === i && (
+            {editing && activeColorLine === i && (
               <div className="absolute top-full left-0 mt-1 bg-white text-gray-900 border border-gray-200 rounded-lg shadow-lg p-2 z-20 flex gap-2 no-print">
                 <button onClick={() => setSectionColorFn(i, null)} className={`w-7 h-7 rounded-full border-2 ${!secColor ? 'border-gray-600 ring-2 ring-offset-1 ring-gray-400' : 'border-gray-300'} bg-white hover:scale-110 transition-transform`} title="Sem cor">✕</button>
                 <button onClick={() => setSectionColorFn(i, 'red')} className={`w-7 h-7 rounded-full border-2 ${secColor === 'red' ? 'ring-2 ring-offset-1 ring-gray-400' : ''} border-red-300 bg-red-100 hover:scale-110 transition-transform`} title="Vermelho" />
@@ -664,3 +668,4 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
     </div>
   )
 }
+
