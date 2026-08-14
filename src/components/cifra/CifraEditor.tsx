@@ -196,7 +196,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
         inRefrao = /refrão|refrao|coro/i.test(sectionMatch[1])
         const repeat = sectionRepeats[i]
         return (
-          <div key={i} className={`section-header mt-2 mb-0.5 relative inline-block ${inRefrao ? 'bg-red-500/[0.06] -mx-2 px-2 pt-1' : ''}`}>
+          <div key={i} className={`section-header mt-2 mb-0.5 relative inline-block ${inRefrao ? 'refrao-bg -mx-2 px-2 pt-1' : ''}`}>
             <span
               className={`inline-flex items-center gap-1 px-2 py-0.5 ${color.bg} ${color.bgText} text-xs font-bold rounded uppercase tracking-wide cursor-pointer hover:opacity-80 no-print-hover`}
               onClick={() => setActiveRepeatLine(activeRepeatLine === i ? null : i)}
@@ -232,7 +232,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
         inRefrao = /refrão|refrao|coro/i.test(line)
         const repeat = sectionRepeats[i]
         return (
-          <div key={i} className={`section-header mt-2 mb-0.5 relative inline-block ${inRefrao ? 'bg-red-500/[0.06] -mx-2 px-2 pt-1' : ''}`}>
+          <div key={i} className={`section-header mt-2 mb-0.5 relative inline-block ${inRefrao ? 'refrao-bg -mx-2 px-2 pt-1' : ''}`}>
             <span
               className={`${color.class} font-bold whitespace-pre cursor-pointer hover:opacity-80`}
               onClick={() => setActiveRepeatLine(activeRepeatLine === i ? null : i)}
@@ -265,18 +265,18 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
       const trimmed = line.trim()
       if (trimmed.length > 0 && isChordLine(line)) {
         return (
-          <div key={i} className={`chord-line ${color.class} font-bold whitespace-pre ${inRefrao ? 'bg-red-500/[0.06] -mx-2 px-2' : ''}`}>
+          <div key={i} className={`chord-line ${color.class} font-bold whitespace-pre ${inRefrao ? 'refrao-bg -mx-2 px-2' : ''}`}>
             {line}
           </div>
         )
       }
 
       if (trimmed.length === 0) {
-        return <div key={i} className={`whitespace-pre ${inRefrao ? 'bg-red-500/[0.06] -mx-2 px-2' : ''}`}>{'\u00A0'}</div>
+        return <div key={i} className={`whitespace-pre ${inRefrao ? 'refrao-bg -mx-2 px-2' : ''}`}>{'\u00A0'}</div>
       }
 
       return (
-        <div key={i} className={`whitespace-pre text-gray-900 ${inRefrao ? 'font-bold bg-red-500/[0.06] -mx-2 px-2' : ''}`}>
+        <div key={i} className={`whitespace-pre text-gray-900 ${inRefrao ? 'font-bold refrao-bg -mx-2 px-2' : ''}`}>
           {line}
         </div>
       )

@@ -39,7 +39,7 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
       if (sectionMatch) {
         inRefrao = /refrão|refrao|coro/i.test(sectionMatch[1])
         return (
-          <div key={i} className={`section-header mt-2 mb-0.5 ${inRefrao ? 'bg-red-500/[0.06] -mx-2 px-2 pt-1' : ''}`}>
+          <div key={i} className={`section-header mt-2 mb-0.5 ${inRefrao ? 'refrao-bg -mx-2 px-2 pt-1' : ''}`}>
             <span className="inline-block px-2 py-0.5 bg-primary-100 text-primary-700 text-xs font-bold rounded uppercase tracking-wide">
               {sectionMatch[1]}
             </span>
@@ -52,7 +52,7 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
       if (isSectionLine(line)) {
         inRefrao = /refrão|refrao|coro/i.test(line)
         return (
-          <div key={i} className={`section-header mt-2 mb-0.5 text-primary-600 font-bold whitespace-pre ${inRefrao ? 'bg-red-500/[0.06] -mx-2 px-2 pt-1' : ''}`}>
+          <div key={i} className={`section-header mt-2 mb-0.5 text-primary-600 font-bold whitespace-pre ${inRefrao ? 'refrao-bg -mx-2 px-2 pt-1' : ''}`}>
             {line}
           </div>
         )
@@ -62,7 +62,7 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
       const trimmed = line.trim()
       if (trimmed.length > 0 && isChordLine(line)) {
         return (
-          <div key={i} className={`chord-line text-primary-600 font-bold whitespace-pre ${inRefrao ? 'bg-red-500/[0.06] -mx-2 px-2' : ''}`}>
+          <div key={i} className={`chord-line text-primary-600 font-bold whitespace-pre ${inRefrao ? 'refrao-bg -mx-2 px-2' : ''}`}>
             {line}
           </div>
         )
@@ -70,12 +70,12 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
 
       // Empty line
       if (trimmed.length === 0) {
-        return <div key={i} className={`whitespace-pre ${inRefrao ? 'bg-red-500/[0.06] -mx-2 px-2' : ''}`}>{'\u00A0'}</div>
+        return <div key={i} className={`whitespace-pre ${inRefrao ? 'refrao-bg -mx-2 px-2' : ''}`}>{'\u00A0'}</div>
       }
 
       // Text line: bold if inside refrão section
       return (
-        <div key={i} className={`whitespace-pre text-gray-900 ${inRefrao ? 'font-bold bg-red-500/[0.06] -mx-2 px-2' : ''}`}>
+        <div key={i} className={`whitespace-pre text-gray-900 ${inRefrao ? 'font-bold refrao-bg -mx-2 px-2' : ''}`}>
           {line}
         </div>
       )
