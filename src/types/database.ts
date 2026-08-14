@@ -128,6 +128,41 @@ export interface Database {
           custom_tom?: string | null
         }
       }
+      repertorio_items: {
+        Row: {
+          id: string
+          created_at: string
+          updated_at: string
+          user_id: string
+          cifra_id: string
+          order: number
+          custom_tom: string | null
+          custom_content: string | null
+          section_repeats: Record<string, number>
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          user_id: string
+          cifra_id: string
+          order?: number
+          custom_tom?: string | null
+          custom_content?: string | null
+          section_repeats?: Record<string, number>
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+          cifra_id?: string
+          order?: number
+          custom_tom?: string | null
+          custom_content?: string | null
+          section_repeats?: Record<string, number>
+        }
+      }
     }
     Views: {
       [_ in never]: never

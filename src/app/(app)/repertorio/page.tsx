@@ -1,17 +1,19 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Search, Plus, X, GripVertical, Printer, Music } from 'lucide-react'
+import { Search, Plus, X, Printer, Music, RefreshCw } from 'lucide-react'
 import { CifraEditor } from '@/components/cifra/CifraEditor'
 import type { Cifra } from '@/types'
 
 interface SelectedCifra {
   cifra: Cifra
   customTom: string | null
-  customContent: string | null  // versão editada (null = usar original)
-  sectionRepeats: Record<number, number>  // repetições de seção
+  customContent: string | null
+  sectionRepeats: Record<number, number>
 }
+
+const LOCAL_KEY = 'cifra-play-repertorio'
 
 export default function RepertorioPage() {
   const [allCifras, setAllCifras] = useState<Cifra[]>([])
@@ -20,25 +22,69 @@ export default function RepertorioPage() {
   const [showSearch, setShowSearch] = useState(false)
   const [viewingCifra, setViewingCifra] = useState<SelectedCifra | null>(null)
   const [loading, setLoading] = useState(true)
+  const [syncing, setSyncing] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
 
   const supabase = createClient()
 
   useEffect(() => {
-    loadCifras()
-    loadSavedRepertorio()
+    init()
   }, [])
 
-  async function loadCifras() {
-    const { data } = await supabase
+  async function init() {
+    // Get user
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) setUserId(user.id)
+
+    // Load cifras
+    const { data: cifras } = await supabase
       .from('cifras')
       .select('*')
       .order('title', { ascending: true })
-    setAllCifras(data || [])
+    setAllCifras(cifras || [])
+
+    // Load repertorio: try remote first, fallback to local
+    if (user) {
+      const loaded = await loadFromRemote(user.id)
+      if (!loaded) {
+        loadFromLocal()
+      }
+    } else {
+      loadFromLocal()
+    }
     setLoading(false)
   }
 
-  function loadSavedRepertorio() {
-    const saved = localStorage.getItem('cifra-play-repertorio')
+  async function loadFromRemote(uid: string): Promise<boolean> {
+    try {
+      const { data, error } = await supabase
+        .from('repertorio_items')
+        .select('*, cifra:cifras(*)')
+        .eq('user_id', uid)
+        .order('order', { ascending: true })
+
+      if (error || !data || data.length === 0) return false
+
+      const items: SelectedCifra[] = data
+        .filter((item: any) => item.cifra)
+        .map((item: any) => ({
+          cifra: item.cifra as Cifra,
+          customTom: item.custom_tom,
+          customContent: item.custom_content,
+          sectionRepeats: (item.section_repeats as Record<number, number>) || {},
+        }))
+
+      setSelected(items)
+      // Update local cache
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(items))
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  function loadFromLocal() {
+    const saved = localStorage.getItem(LOCAL_KEY)
     if (saved) {
       try {
         setSelected(JSON.parse(saved))
@@ -46,9 +92,39 @@ export default function RepertorioPage() {
     }
   }
 
-  function saveRepertorio(items: SelectedCifra[]) {
-    localStorage.setItem('cifra-play-repertorio', JSON.stringify(items))
+  // Save to localStorage and sync to remote
+  const saveRepertorio = useCallback(async (items: SelectedCifra[]) => {
     setSelected(items)
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(items))
+    await syncToRemote(items)
+  }, [userId])
+
+  async function syncToRemote(items: SelectedCifra[]) {
+    if (!userId) return
+    setSyncing(true)
+    try {
+      // Delete all current items for user
+      await supabase
+        .from('repertorio_items')
+        .delete()
+        .eq('user_id', userId)
+
+      // Insert new items
+      if (items.length > 0) {
+        const rows = items.map((item, index) => ({
+          user_id: userId,
+          cifra_id: item.cifra.id,
+          order: index,
+          custom_tom: item.customTom,
+          custom_content: item.customContent,
+          section_repeats: item.sectionRepeats || {},
+        }))
+        await supabase.from('repertorio_items').insert(rows)
+      }
+    } catch {
+      // Offline — local is already saved, will sync next time
+    }
+    setSyncing(false)
   }
 
   function addCifra(cifra: Cifra) {
@@ -105,6 +181,13 @@ export default function RepertorioPage() {
     }
   }
 
+  async function forceSync() {
+    if (!userId) return
+    setSyncing(true)
+    await loadFromRemote(userId)
+    setSyncing(false)
+  }
+
   function handlePrintAll() {
     window.print()
   }
@@ -158,8 +241,18 @@ export default function RepertorioPage() {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-6 no-print">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Repertório do Dia</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Repertório do Dia</h1>
+          {syncing && <RefreshCw className="w-4 h-4 text-primary-500 animate-spin" />}
+        </div>
         <div className="flex gap-2">
+          <button
+            onClick={forceSync}
+            className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
+            title="Sincronizar com outros dispositivos"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
           {selected.length > 0 && (
             <>
               <button
