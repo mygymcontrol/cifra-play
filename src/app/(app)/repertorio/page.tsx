@@ -11,6 +11,7 @@ interface SelectedCifra {
   customTom: string | null
   customContent: string | null
   sectionRepeats: Record<number, number>
+  sectionColors: Record<number, string>
 }
 
 const LOCAL_KEY = 'cifra-play-repertorio'
@@ -79,6 +80,7 @@ export default function RepertorioPage() {
           customTom: item.custom_tom,
           customContent: item.custom_content,
           sectionRepeats: (item.section_repeats as Record<number, number>) || {},
+          sectionColors: ((item as any).section_colors as Record<number, string>) || {},
         }))
 
       setSelected(items)
@@ -125,6 +127,7 @@ export default function RepertorioPage() {
           custom_tom: item.customTom,
           custom_content: item.customContent,
           section_repeats: item.sectionRepeats || {},
+          section_colors: item.sectionColors || {},
         }))
         await supabase.from('repertorio_items').insert(rows)
       }
@@ -136,7 +139,7 @@ export default function RepertorioPage() {
 
   function addCifra(cifra: Cifra) {
     if (selected.some((s) => s.cifra.id === cifra.id)) return
-    const newSelected = [...selected, { cifra, customTom: cifra.tom, customContent: null, sectionRepeats: {} }]
+    const newSelected = [...selected, { cifra, customTom: cifra.tom, customContent: null, sectionRepeats: {}, sectionColors: {} }]
     saveRepertorio(newSelected)
     setShowSearch(false)
     setSearch('')
@@ -164,6 +167,13 @@ export default function RepertorioPage() {
   function updateSectionRepeats(id: string, repeats: Record<number, number>) {
     const newSelected = selected.map((s) =>
       s.cifra.id === id ? { ...s, sectionRepeats: repeats } : s
+    )
+    saveRepertorio(newSelected)
+  }
+
+  function updateSectionColors(id: string, colors: Record<number, string>) {
+    const newSelected = selected.map((s) =>
+      s.cifra.id === id ? { ...s, sectionColors: colors } : s
     )
     saveRepertorio(newSelected)
   }
@@ -299,15 +309,20 @@ export default function RepertorioPage() {
           title={viewingCifra.cifra.title}
           artist={viewingCifra.cifra.artist}
           sectionRepeats={viewingCifra.sectionRepeats}
+          sectionColors={viewingCifra.sectionColors}
           onSave={(newContent) => {
             updateContent(viewingCifra.cifra.id, newContent)
           }}
           onRestore={() => {
             updateContent(viewingCifra.cifra.id, viewingCifra.cifra.content)
             updateSectionRepeats(viewingCifra.cifra.id, {})
+            updateSectionColors(viewingCifra.cifra.id, {})
           }}
           onSectionRepeatsChange={(repeats) => {
             updateSectionRepeats(viewingCifra.cifra.id, repeats)
+          }}
+          onSectionColorsChange={(colors) => {
+            updateSectionColors(viewingCifra.cifra.id, colors)
           }}
         />
         <p className="text-xs text-gray-400 mt-3 no-print text-center">

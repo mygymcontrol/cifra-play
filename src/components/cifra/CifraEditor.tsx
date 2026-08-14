@@ -27,9 +27,11 @@ interface CifraEditorProps {
   onRestore: () => void
   sectionRepeats?: Record<number, number>
   onSectionRepeatsChange?: (repeats: Record<number, number>) => void
+  sectionColors?: Record<number, string>
+  onSectionColorsChange?: (colors: Record<number, string>) => void
 }
 
-export function CifraEditor({ content, originalContent, originalTom, title, artist, onSave, onRestore, sectionRepeats: savedRepeats, onSectionRepeatsChange }: CifraEditorProps) {
+export function CifraEditor({ content, originalContent, originalTom, title, artist, onSave, onRestore, sectionRepeats: savedRepeats, onSectionRepeatsChange, sectionColors: savedColors, onSectionColorsChange }: CifraEditorProps) {
   const [transpose, setTranspose] = useState(0)
   const [fontSize, setFontSize] = useState(8)
   const [editing, setEditing] = useState(false)
@@ -37,7 +39,9 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
   const [chordColor, setChordColor] = useState<ChordColor>('blue')
   const [showColorPicker, setShowColorPicker] = useState(false)
   const [sectionRepeats, setSectionRepeats] = useState<Record<number, number>>(savedRepeats || {})
+  const [sectionColors, setSectionColors] = useState<Record<number, string>>(savedColors || {})
   const [activeRepeatLine, setActiveRepeatLine] = useState<number | null>(null)
+  const [activeColorLine, setActiveColorLine] = useState<number | null>(null)
   const [lastFocusedLine, setLastFocusedLine] = useState<number | null>(null)
 
   const rawContent = editing ? editContent : content
@@ -80,6 +84,32 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
     setActiveRepeatLine(null)
     // Auto-save to repertório
     onSectionRepeatsChange?.(next)
+  }
+
+  function setSectionColorFn(lineIndex: number, colorName: string | null) {
+    const next = { ...sectionColors }
+    if (colorName) {
+      next[lineIndex] = colorName
+    } else {
+      delete next[lineIndex]
+    }
+    setSectionColors(next)
+    setActiveColorLine(null)
+    onSectionColorsChange?.(next)
+  }
+
+  const SECTION_BG_COLORS: Record<string, string> = {
+    red: 'rgba(239, 68, 68, 0.08)',
+    green: 'rgba(34, 197, 94, 0.08)',
+    blue: 'rgba(59, 130, 246, 0.08)',
+    yellow: 'rgba(234, 179, 8, 0.08)',
+  }
+
+  const SECTION_BG_COLORS_DARK: Record<string, string> = {
+    red: 'rgba(239, 68, 68, 0.15)',
+    green: 'rgba(34, 197, 94, 0.15)',
+    blue: 'rgba(59, 130, 246, 0.15)',
+    yellow: 'rgba(234, 179, 8, 0.15)',
   }
 
   function insertSection(sectionName: string) {
@@ -191,22 +221,34 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
   function renderContent(text: string) {
     const lines = text.split('\n')
     
-    // PASSO 1: Determinar quais linhas pertencem ao refrão
+    // PASSO 1: Determinar quais linhas pertencem ao refrão ou seção com cor
     const isRefraoArr: boolean[] = new Array(lines.length).fill(false)
+    const lineSectionColor: (string | null)[] = new Array(lines.length).fill(null)
     let refrao = false
+    let currentSectionColor: string | null = null
+    let currentSectionLineIdx: number | null = null
     
     for (let i = 0; i < lines.length; i++) {
       const isEmpty = !lines[i] || /^\s*$/.test(lines[i])
-      if (isEmpty) { refrao = false; continue }
+      if (isEmpty) { refrao = false; currentSectionColor = null; currentSectionLineIdx = null; continue }
       const sm = lines[i].trim().match(/^\[([^\]]+)\]/)
-      if (sm) { refrao = /refrão|refrao|coro/i.test(sm[1]) }
-      else if (isSectionLine(lines[i])) { refrao = /refrão|refrao|coro/i.test(lines[i]) }
+      if (sm) {
+        refrao = /refrão|refrao|coro/i.test(sm[1])
+        currentSectionLineIdx = i
+        currentSectionColor = sectionColors[i] || null
+      } else if (isSectionLine(lines[i])) {
+        refrao = /refrão|refrao|coro/i.test(lines[i])
+        currentSectionLineIdx = i
+        currentSectionColor = sectionColors[i] || null
+      }
       isRefraoArr[i] = refrao
+      lineSectionColor[i] = currentSectionColor
     }
     
     // PASSO 2: Agrupar e renderizar
-    const groups: { isRefrao: boolean; elements: React.ReactNode[] }[] = []
-    let currentGroup: { isRefrao: boolean; elements: React.ReactNode[] } | null = null
+    type GroupType = { isRefrao: boolean; bgColor: string | null; elements: React.ReactNode[] }
+    const groups: GroupType[] = []
+    let currentGroup: GroupType | null = null
     let prevWasEmpty = false
     
     for (let i = 0; i < lines.length; i++) {
@@ -226,8 +268,9 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
       
       if (sectionMatch) {
         const repeat = sectionRepeats[i]
+        const secColor = sectionColors[i]
         element = (
-          <div key={i} className="section-header mt-2 mb-0.5 relative inline-block">
+          <div key={i} className="section-header mt-2 mb-0.5 relative inline-flex items-center gap-1">
             <span
               className={`inline-flex items-center gap-1 px-2 py-0.5 ${color.bg} ${color.bgText} text-xs font-bold rounded uppercase tracking-wide cursor-pointer hover:opacity-80`}
               onClick={() => setActiveRepeatLine(activeRepeatLine === i ? null : i)}
@@ -236,6 +279,13 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
               {sectionMatch[1]}
             </span>
             {sectionMatch[2] && <span className={`ml-1 ${color.class} font-bold`}>{sectionMatch[2]}</span>}
+            {/* Color picker button */}
+            <button
+              onClick={() => setActiveColorLine(activeColorLine === i ? null : i)}
+              className={`w-5 h-5 rounded-full border-2 border-gray-300 cursor-pointer hover:scale-110 transition-transform no-print ${secColor ? '' : 'bg-white'}`}
+              style={secColor ? { backgroundColor: SECTION_BG_COLORS[secColor]?.replace('0.08', '0.5') || '' } : {}}
+              title="Cor de fundo da seção"
+            />
             {activeRepeatLine === i && (
               <div className="absolute top-full left-0 mt-1 bg-white text-gray-900 border border-gray-200 rounded-lg shadow-lg p-1.5 z-20 flex gap-1 flex-wrap no-print">
                 <button onClick={() => setRepeat(i, null)} className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${!repeat ? 'bg-gray-200 font-bold' : 'hover:bg-gray-100'}`}>—</button>
@@ -244,15 +294,25 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
                 ))}
               </div>
             )}
+            {activeColorLine === i && (
+              <div className="absolute top-full left-0 mt-1 bg-white text-gray-900 border border-gray-200 rounded-lg shadow-lg p-2 z-20 flex gap-2 no-print">
+                <button onClick={() => setSectionColorFn(i, null)} className={`w-7 h-7 rounded-full border-2 ${!secColor ? 'border-gray-600 ring-2 ring-offset-1 ring-gray-400' : 'border-gray-300'} bg-white hover:scale-110 transition-transform`} title="Sem cor">✕</button>
+                <button onClick={() => setSectionColorFn(i, 'red')} className={`w-7 h-7 rounded-full border-2 ${secColor === 'red' ? 'ring-2 ring-offset-1 ring-gray-400' : ''} border-red-300 bg-red-100 hover:scale-110 transition-transform`} title="Vermelho" />
+                <button onClick={() => setSectionColorFn(i, 'green')} className={`w-7 h-7 rounded-full border-2 ${secColor === 'green' ? 'ring-2 ring-offset-1 ring-gray-400' : ''} border-green-300 bg-green-100 hover:scale-110 transition-transform`} title="Verde" />
+                <button onClick={() => setSectionColorFn(i, 'blue')} className={`w-7 h-7 rounded-full border-2 ${secColor === 'blue' ? 'ring-2 ring-offset-1 ring-gray-400' : ''} border-blue-300 bg-blue-100 hover:scale-110 transition-transform`} title="Azul" />
+                <button onClick={() => setSectionColorFn(i, 'yellow')} className={`w-7 h-7 rounded-full border-2 ${secColor === 'yellow' ? 'ring-2 ring-offset-1 ring-gray-400' : ''} border-yellow-300 bg-yellow-100 hover:scale-110 transition-transform`} title="Amarelo" />
+              </div>
+            )}
           </div>
         )
       } else if (isSectionLine(line)) {
         const repeat = sectionRepeats[i]
+        const secColor = sectionColors[i]
         const sectionNameMatch = line.trim().match(/^(\d+x\s*)?(\[?(?:INTRO|INTRODUÇÃO|VERSO|PRÉ-REFRÃO|PRE-REFRÃO|REFRÃO|PONTE|BRIDGE|SOLO|INTERLÚDIO|INTERLUDIO|INSTRUMENTAL|FINAL|CODA|OUTR[OA]|CORO|RAMPA|PRIMEIRA PARTE|SEGUNDA PARTE|TERCEIRA PARTE)\]?)\s*(.*)$/i)
         const sectionLabel = sectionNameMatch ? (sectionNameMatch[1] || '') + sectionNameMatch[2].replace(/[\[\]]/g, '') : line.trim()
         const sectionRest = sectionNameMatch ? sectionNameMatch[3] : ''
         element = (
-          <div key={i} className="section-header mt-2 mb-0.5 relative inline-block">
+          <div key={i} className="section-header mt-2 mb-0.5 relative inline-flex items-center gap-1">
             <span
               className={`inline-flex items-center gap-1 px-2 py-0.5 ${color.bg} ${color.bgText} text-xs font-bold rounded uppercase tracking-wide cursor-pointer hover:opacity-80`}
               onClick={() => setActiveRepeatLine(activeRepeatLine === i ? null : i)}
@@ -261,12 +321,28 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
               {sectionLabel}
             </span>
             {sectionRest && <span className={`ml-1 ${color.class} font-bold`}>{sectionRest}</span>}
+            {/* Color picker button */}
+            <button
+              onClick={() => setActiveColorLine(activeColorLine === i ? null : i)}
+              className={`w-5 h-5 rounded-full border-2 border-gray-300 cursor-pointer hover:scale-110 transition-transform no-print ${secColor ? '' : 'bg-white'}`}
+              style={secColor ? { backgroundColor: SECTION_BG_COLORS[secColor]?.replace('0.08', '0.5') || '' } : {}}
+              title="Cor de fundo da seção"
+            />
             {activeRepeatLine === i && (
               <div className="absolute top-full left-0 mt-1 bg-white text-gray-900 border border-gray-200 rounded-lg shadow-lg p-1.5 z-20 flex gap-1 flex-wrap no-print">
                 <button onClick={() => setRepeat(i, null)} className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${!repeat ? 'bg-gray-200 font-bold' : 'hover:bg-gray-100'}`}>—</button>
                 {[1,2,3,4,5,6,7,8,9,10].map(n => (
                   <button key={n} onClick={() => setRepeat(i, n)} className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${repeat === n ? `${color.bg} ${color.bgText} font-bold` : 'hover:bg-gray-100'}`}>{n}x</button>
                 ))}
+              </div>
+            )}
+            {activeColorLine === i && (
+              <div className="absolute top-full left-0 mt-1 bg-white text-gray-900 border border-gray-200 rounded-lg shadow-lg p-2 z-20 flex gap-2 no-print">
+                <button onClick={() => setSectionColorFn(i, null)} className={`w-7 h-7 rounded-full border-2 ${!secColor ? 'border-gray-600 ring-2 ring-offset-1 ring-gray-400' : 'border-gray-300'} bg-white hover:scale-110 transition-transform`} title="Sem cor">✕</button>
+                <button onClick={() => setSectionColorFn(i, 'red')} className={`w-7 h-7 rounded-full border-2 ${secColor === 'red' ? 'ring-2 ring-offset-1 ring-gray-400' : ''} border-red-300 bg-red-100 hover:scale-110 transition-transform`} title="Vermelho" />
+                <button onClick={() => setSectionColorFn(i, 'green')} className={`w-7 h-7 rounded-full border-2 ${secColor === 'green' ? 'ring-2 ring-offset-1 ring-gray-400' : ''} border-green-300 bg-green-100 hover:scale-110 transition-transform`} title="Verde" />
+                <button onClick={() => setSectionColorFn(i, 'blue')} className={`w-7 h-7 rounded-full border-2 ${secColor === 'blue' ? 'ring-2 ring-offset-1 ring-gray-400' : ''} border-blue-300 bg-blue-100 hover:scale-110 transition-transform`} title="Azul" />
+                <button onClick={() => setSectionColorFn(i, 'yellow')} className={`w-7 h-7 rounded-full border-2 ${secColor === 'yellow' ? 'ring-2 ring-offset-1 ring-gray-400' : ''} border-yellow-300 bg-yellow-100 hover:scale-110 transition-transform`} title="Amarelo" />
               </div>
             )}
           </div>
@@ -287,9 +363,9 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
         )
       }
       
-      if (!currentGroup || currentGroup.isRefrao !== lineIsRefrao) {
+      if (!currentGroup || currentGroup.isRefrao !== lineIsRefrao || currentGroup.bgColor !== lineSectionColor[i]) {
         if (currentGroup) groups.push(currentGroup)
-        currentGroup = { isRefrao: lineIsRefrao, elements: [element] }
+        currentGroup = { isRefrao: lineIsRefrao, bgColor: lineSectionColor[i], elements: [element] }
       } else {
         currentGroup.elements.push(element)
       }
@@ -297,11 +373,23 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
     
     if (currentGroup) groups.push(currentGroup)
     
-    return groups.map((group, gi) => (
-      <div key={gi} className={group.isRefrao ? 'refrao-bg' : ''}>
-        {group.elements}
-      </div>
-    ))
+    const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+    
+    return groups.map((group, gi) => {
+      let style: React.CSSProperties = {}
+      if (group.bgColor) {
+        style.backgroundColor = isDark ? (SECTION_BG_COLORS_DARK[group.bgColor] || '') : (SECTION_BG_COLORS[group.bgColor] || '')
+        style.marginLeft = '-4px'
+        style.marginRight = '-4px'
+        style.paddingLeft = '4px'
+        style.paddingRight = '4px'
+      }
+      return (
+        <div key={gi} className={group.isRefrao && !group.bgColor ? 'refrao-bg' : ''} style={style}>
+          {group.elements}
+        </div>
+      )
+    })
   }
 
   return (
