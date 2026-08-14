@@ -30,19 +30,25 @@
   * {
     @apply border-gray-200;
   }
+  html {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+  }
   body {
     @apply bg-white text-gray-900 antialiased;
     overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
   }
 }
 
 /* Estilo para cifras */
 .cifra-content {
   font-family: 'Courier New', Courier, monospace;
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  position: relative;
+  white-space: pre;
+  overflow: hidden;
+  width: 100%;
 }
 
 .cifra-content .chord-line {
@@ -51,7 +57,8 @@
 
 .cifra-sheet {
   padding: 16px;
-  position: relative;
+  width: 100%;
+  overflow: hidden;
 }
 
 @media (min-width: 640px) {
@@ -60,25 +67,21 @@
   }
 }
 
-/* Mobile: ajustar fonte para caber na tela */
+/* Mobile */
 @media (max-width: 639px) {
   .cifra-content {
     font-size: 2.4vw !important;
     line-height: 1.4 !important;
-    border: 2px solid blue !important;
   }
 
   .cifra-sheet {
     padding: 8px;
-    border: 2px solid green !important;
+    border: none !important;
     border-radius: 0;
     margin-left: -16px;
     margin-right: -16px;
     width: calc(100% + 32px);
-  }
-
-  .refrao-bg {
-    border: 2px solid red !important;
+    overflow: hidden;
   }
 
   .section-header {
@@ -135,7 +138,7 @@
     margin: 0;
     width: 100%;
     max-width: 210mm;
-    min-height: 277mm; /* A4 height minus margins */
+    min-height: 277mm;
     page-break-inside: avoid;
   }
 
