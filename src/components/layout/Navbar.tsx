@@ -1,15 +1,36 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Music, Library, User, LogOut, ListMusic, Menu, X } from 'lucide-react'
+import { Music, Library, User, LogOut, ListMusic, Menu, X, Moon, Sun } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 export function Navbar() {
   const [open, setOpen] = useState(false)
+  const [dark, setDark] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+
+  useEffect(() => {
+    const saved = localStorage.getItem('cifra-play-dark')
+    if (saved === 'true') {
+      setDark(true)
+      document.documentElement.classList.add('dark')
+    }
+  }, [])
+
+  function toggleDark() {
+    const newDark = !dark
+    setDark(newDark)
+    if (newDark) {
+      document.documentElement.classList.add('dark')
+      localStorage.setItem('cifra-play-dark', 'true')
+    } else {
+      document.documentElement.classList.remove('dark')
+      localStorage.setItem('cifra-play-dark', 'false')
+    }
+  }
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -18,7 +39,7 @@ export function Navbar() {
   }
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 no-print">
+    <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 no-print">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-12 sm:h-16">
           {/* Logo */}
@@ -31,28 +52,35 @@ export function Navbar() {
           <div className="hidden sm:flex items-center gap-4">
             <Link
               href="/biblioteca"
-              className="flex items-center gap-1 text-gray-600 hover:text-gray-900 transition-colors"
+              className="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               <Library className="w-4 h-4" aria-hidden="true" />
               <span>Biblioteca</span>
             </Link>
             <Link
               href="/repertorio"
-              className="flex items-center gap-1 text-gray-600 hover:text-gray-900 transition-colors"
+              className="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               <ListMusic className="w-4 h-4" aria-hidden="true" />
               <span>Repertório</span>
             </Link>
+            <button
+              onClick={toggleDark}
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+              aria-label="Alternar modo escuro"
+            >
+              {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
             <Link
               href="/perfil"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
               aria-label="Perfil"
             >
               <User className="w-5 h-5" />
             </Link>
             <button
               onClick={handleLogout}
-              className="text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
               aria-label="Sair"
             >
               <LogOut className="w-5 h-5" />
@@ -60,13 +88,22 @@ export function Navbar() {
           </div>
 
           {/* Mobile menu button */}
-          <button
-            onClick={() => setOpen(!open)}
-            className="sm:hidden p-2 text-gray-600 hover:text-gray-900"
-            aria-label="Menu"
-          >
-            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          <div className="flex items-center gap-2 sm:hidden">
+            <button
+              onClick={toggleDark}
+              className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              aria-label="Alternar modo escuro"
+            >
+              {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+            <button
+              onClick={() => setOpen(!open)}
+              className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              aria-label="Menu"
+            >
+              {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
       </div>
 

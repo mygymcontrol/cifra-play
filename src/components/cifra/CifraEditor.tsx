@@ -456,7 +456,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
       )}
 
       {/* Conteúdo */}
-      <div className="cifra-sheet bg-white sm:rounded-lg sm:border border-gray-200">
+      <div className="cifra-sheet bg-white dark:bg-gray-800 sm:rounded-lg sm:border border-gray-200 dark:border-gray-700">
         {(title || artist) && (
           <div className="cifra-header mb-3 pb-2 border-b border-gray-200">
             {title && <h2 className="text-lg font-bold text-gray-900">{title}</h2>}

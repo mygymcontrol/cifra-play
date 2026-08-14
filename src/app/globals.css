@@ -28,7 +28,7 @@
 
 @layer base {
   * {
-    @apply border-gray-200;
+    @apply border-gray-200 dark:border-gray-700;
   }
   html {
     overflow-x: hidden;
@@ -36,7 +36,7 @@
     max-width: 100%;
   }
   body {
-    @apply bg-white text-gray-900 antialiased;
+    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased;
     overflow-x: hidden;
     width: 100%;
     max-width: 100%;
@@ -48,6 +48,10 @@
   font-family: 'Courier New', Courier, monospace;
   white-space: pre;
   width: 100%;
+}
+
+:is(.dark) .cifra-content {
+  color: #e5e7eb;
 }
 
 .cifra-content .chord-line {
@@ -94,6 +98,10 @@
   margin-right: -4px;
   padding-left: 4px;
   padding-right: 4px;
+}
+
+:is(.dark) .refrao-bg {
+  background-color: rgba(239, 68, 68, 0.15);
 }
 
 @media (min-width: 640px) {
