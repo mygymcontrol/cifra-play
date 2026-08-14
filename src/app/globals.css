@@ -49,7 +49,6 @@
 
 .cifra-sheet {
   padding: 16px;
-  overflow: hidden;
 }
 
 @media (min-width: 640px) {
