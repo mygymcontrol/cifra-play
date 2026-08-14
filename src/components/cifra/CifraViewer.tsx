@@ -37,16 +37,16 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
     let inRefrao = false
     
     for (let i = 0; i < lines.length; i++) {
-      const trimmed = lines[i].trim()
+      const isEmpty = !lines[i] || lines[i].match(/^\s*$/)
       
-      // Linha vazia = encerra refrão
-      if (trimmed.length === 0) {
+      // Linha vazia/whitespace = encerra refrão
+      if (isEmpty) {
         inRefrao = false
         continue
       }
       
       // Marcador de seção
-      const sectionMatch = trimmed.match(/^\[([^\]]+)\]/)
+      const sectionMatch = lines[i].trim().match(/^\[([^\]]+)\]/)
       if (sectionMatch) {
         inRefrao = /refrão|refrao|coro/i.test(sectionMatch[1])
       } else if (isSectionLine(lines[i])) {
