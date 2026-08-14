@@ -10,7 +10,7 @@
  */
 
 // Acorde: A-G, opcionais #/b/♯/♭, opcionais m/dim/aug/sus/maj/add/números, opcionais /baixo, opcionais :acorde
-const CHORD_REGEX = /^[A-G][#b♯♭]?(?:m|dim|aug|sus[24]?|maj|add|[0-9])*(?:\/[A-G][#b♯♭]?(?:[0-9])?)?(?:[:]?[A-G][#b♯♭]?(?:m|dim|aug|sus[24]?|maj|add|[0-9])*(?:\/[A-G][#b♯♭]?)?)?$/
+const CHORD_REGEX = /^[A-G][#b♯♭]?(?:[mM]|[dD][iI][mM]|[aA][uU][gG]|[sS][uU][sS][24]?|[mM][aA][jJ]|[aA][dD][dD]|[0-9])*(?:\/[A-G][#b♯♭]?(?:[0-9])?)?(?:[:]?[A-G][#b♯♭]?(?:[mM]|[dD][iI][mM]|[aA][uU][gG]|[sS][uU][sS][24]?|[mM][aA][jJ]|[aA][dD][dD]|[0-9])*(?:\/[A-G][#b♯♭]?)?)?$/
 
 // Palavras que indicam contexto musical (não são acordes, mas fazem parte de linhas de acordes)
 const MUSICAL_KEYWORDS = /^(?:intro|instrumental|solo|interlúdio|interlude|interludio|ponte|bridge|riff|tab|final|coda|outr[oa]?)$/i
