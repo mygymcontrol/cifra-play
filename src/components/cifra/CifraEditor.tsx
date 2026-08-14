@@ -338,7 +338,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Fonte:</span>
           <button
-            onClick={() => setFontSize((s) => Math.max(10, s - 1))}
+            onClick={() => setFontSize((s) => Math.max(7, s - 1))}
             className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white hover:bg-gray-50"
             aria-label="Diminuir fonte"
           >
