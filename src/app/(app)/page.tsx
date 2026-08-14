@@ -12,8 +12,8 @@ export default async function HomePage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Cifra Play</h1>
-        <p className="mt-2 text-gray-600">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Cifra Play</h1>
+        <p className="mt-2 text-gray-600 dark:text-gray-400">
           Suas cifras organizadas em um só lugar
         </p>
       </div>
@@ -30,19 +30,19 @@ export default async function HomePage() {
 
         <Link
           href="/biblioteca"
-          className="flex flex-col items-center gap-3 p-6 bg-white border border-gray-200 rounded-xl hover:shadow-md transition-all"
+          className="flex flex-col items-center gap-3 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl hover:shadow-md transition-all"
         >
-          <Library className="w-8 h-8 text-gray-600" />
-          <span className="font-semibold text-gray-700">Biblioteca</span>
+          <Library className="w-8 h-8 text-gray-600 dark:text-gray-400" />
+          <span className="font-semibold text-gray-700 dark:text-gray-200">Biblioteca</span>
           <span className="text-xs text-gray-500">{count || 0} cifras disponíveis</span>
         </Link>
 
         <Link
           href="/cifras/nova"
-          className="flex flex-col items-center gap-3 p-6 bg-white border border-gray-200 rounded-xl hover:shadow-md transition-all"
+          className="flex flex-col items-center gap-3 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl hover:shadow-md transition-all"
         >
-          <PlusCircle className="w-8 h-8 text-gray-600" />
-          <span className="font-semibold text-gray-700">Nova Cifra</span>
+          <PlusCircle className="w-8 h-8 text-gray-600 dark:text-gray-400" />
+          <span className="font-semibold text-gray-700 dark:text-gray-200">Nova Cifra</span>
           <span className="text-xs text-gray-500">Adicionar manualmente</span>
         </Link>
       </div>

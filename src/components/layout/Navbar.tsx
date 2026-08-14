@@ -109,12 +109,12 @@ export function Navbar() {
 
       {/* Mobile menu dropdown */}
       {open && (
-        <div className="sm:hidden border-t border-gray-100 bg-white pb-3">
+        <div className="sm:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-black pb-3">
           <div className="flex flex-col px-4 pt-2 space-y-2">
             <Link
               href="/biblioteca"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2 py-2 text-gray-700 hover:text-primary-600"
+              className="flex items-center gap-2 py-2 text-gray-700 dark:text-gray-200 hover:text-primary-600"
             >
               <Library className="w-4 h-4" />
               <span>Biblioteca</span>
@@ -122,7 +122,7 @@ export function Navbar() {
             <Link
               href="/repertorio"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2 py-2 text-gray-700 hover:text-primary-600"
+              className="flex items-center gap-2 py-2 text-gray-700 dark:text-gray-200 hover:text-primary-600"
             >
               <ListMusic className="w-4 h-4" />
               <span>Repertório</span>
@@ -130,14 +130,14 @@ export function Navbar() {
             <Link
               href="/perfil"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2 py-2 text-gray-700 hover:text-primary-600"
+              className="flex items-center gap-2 py-2 text-gray-700 dark:text-gray-200 hover:text-primary-600"
             >
               <User className="w-4 h-4" />
               <span>Perfil</span>
             </Link>
             <button
               onClick={() => { handleLogout(); setOpen(false) }}
-              className="flex items-center gap-2 py-2 text-gray-700 hover:text-red-600"
+              className="flex items-center gap-2 py-2 text-gray-700 dark:text-gray-200 hover:text-red-600"
             >
               <LogOut className="w-4 h-4" />
               <span>Sair</span>

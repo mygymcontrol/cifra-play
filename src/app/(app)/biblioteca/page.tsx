@@ -42,7 +42,7 @@ export default function BibliotecaPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Biblioteca</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Biblioteca</h1>
         <Link
           href="/cifras/nova"
           className="inline-flex items-center gap-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
@@ -60,7 +60,7 @@ export default function BibliotecaPage() {
           placeholder="Buscar por título, artista ou categoria..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+          className="w-full pl-10 pr-10 py-2.5 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
         />
         {search && (
           <button
@@ -83,9 +83,9 @@ export default function BibliotecaPage() {
             <Link
               key={cifra.id}
               href={`/cifras/${cifra.id}`}
-              className="block p-4 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-primary-200 transition-all"
+              className="block p-4 bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 hover:shadow-md hover:border-primary-200 transition-all"
             >
-              <h3 className="font-semibold text-gray-900 truncate text-sm">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate text-sm">
                 {cifra.title}
               </h3>
               <p className="text-xs text-gray-500 mt-0.5 truncate">{cifra.artist}</p>

@@ -123,7 +123,7 @@ export default function RepertorioPage() {
       <div className="max-w-4xl mx-auto">
         <button
           onClick={() => setViewingCifra(null)}
-          className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 mb-4 no-print"
+          className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-4 no-print"
         >
           ← Voltar ao repertório
         </button>
@@ -158,7 +158,7 @@ export default function RepertorioPage() {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-6 no-print">
-        <h1 className="text-2xl font-bold text-gray-900">Repertório do Dia</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Repertório do Dia</h1>
         <div className="flex gap-2">
           {selected.length > 0 && (
             <>
@@ -187,7 +187,7 @@ export default function RepertorioPage() {
           {selected.map((item, index) => (
             <div
               key={item.cifra.id}
-              className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 shadow-sm"
+              className="flex items-center gap-3 p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm"
             >
               <div className="flex flex-col gap-0.5">
                 <button
@@ -214,7 +214,7 @@ export default function RepertorioPage() {
                 className="flex-1 cursor-pointer"
                 onClick={() => setViewingCifra(item)}
               >
-                <h3 className="font-medium text-sm text-gray-900 truncate">
+                <h3 className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
                   {item.cifra.title}
                   {item.customContent && (
                     <span className="ml-1.5 text-[10px] px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded">
@@ -248,7 +248,7 @@ export default function RepertorioPage() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 mb-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+        <div className="text-center py-12 mb-6 bg-gray-50 dark:bg-gray-900 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
           <Music className="w-8 h-8 text-gray-300 mx-auto mb-2" />
           <p className="text-gray-500">Nenhuma cifra selecionada</p>
           <p className="text-sm text-gray-400 mt-1">Adicione cifras ao repertório do dia</p>
@@ -265,9 +265,9 @@ export default function RepertorioPage() {
           Adicionar cifra ao repertório
         </button>
       ) : (
-        <div className="bg-white rounded-lg border border-gray-200 shadow-lg p-4 no-print">
+        <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-lg border border-gray-200 dark:border-gray-800 shadow-lg p-4 no-print">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium text-gray-900">Adicionar cifra</h3>
+            <h3 className="font-medium text-gray-900 dark:text-gray-100">Adicionar cifra</h3>
             <button
               onClick={() => { setShowSearch(false); setSearch('') }}
               className="text-gray-400 hover:text-gray-600"
@@ -284,7 +284,7 @@ export default function RepertorioPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               autoFocus
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
             />
           </div>
 

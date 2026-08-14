@@ -235,7 +235,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
             </span>
             {sectionMatch[2] && <span className={`ml-1 ${color.class} font-bold`}>{sectionMatch[2]}</span>}
             {activeRepeatLine === i && (
-              <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-1.5 z-20 flex gap-1 flex-wrap no-print">
+              <div className="absolute top-full left-0 mt-1 bg-white text-gray-900 border border-gray-200 rounded-lg shadow-lg p-1.5 z-20 flex gap-1 flex-wrap no-print">
                 <button onClick={() => setRepeat(i, null)} className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${!repeat ? 'bg-gray-200 font-bold' : 'hover:bg-gray-100'}`}>—</button>
                 {[1,2,3,4,5,6,7,8,9,10].map(n => (
                   <button key={n} onClick={() => setRepeat(i, n)} className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${repeat === n ? `${color.bg} ${color.bgText} font-bold` : 'hover:bg-gray-100'}`}>{n}x</button>
@@ -260,7 +260,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
             </span>
             {sectionRest && <span className={`ml-1 ${color.class} font-bold`}>{sectionRest}</span>}
             {activeRepeatLine === i && (
-              <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-1.5 z-20 flex gap-1 flex-wrap no-print">
+              <div className="absolute top-full left-0 mt-1 bg-white text-gray-900 border border-gray-200 rounded-lg shadow-lg p-1.5 z-20 flex gap-1 flex-wrap no-print">
                 <button onClick={() => setRepeat(i, null)} className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${!repeat ? 'bg-gray-200 font-bold' : 'hover:bg-gray-100'}`}>—</button>
                 {[1,2,3,4,5,6,7,8,9,10].map(n => (
                   <button key={n} onClick={() => setRepeat(i, n)} className={`w-7 h-7 text-[10px] rounded flex items-center justify-center ${repeat === n ? `${color.bg} ${color.bgText} font-bold` : 'hover:bg-gray-100'}`}>{n}x</button>
@@ -372,7 +372,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
             <span className={`w-3 h-3 rounded-full ${color.dot}`} />
           </button>
           {showColorPicker && (
-            <div className="absolute top-full mt-1 left-0 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-10 flex gap-2">
+            <div className="absolute top-full mt-1 left-0 bg-white text-gray-900 border border-gray-200 rounded-lg shadow-lg p-2 z-10 flex gap-2">
               {(Object.keys(CHORD_COLORS) as ChordColor[]).map((key) => (
                 <button
                   key={key}
