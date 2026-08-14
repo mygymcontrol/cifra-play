@@ -80,19 +80,14 @@
 /* Fundo do refrão - wrapper que preenche toda a largura */
 .refrao-bg {
   background-color: rgba(239, 68, 68, 0.06);
-  margin-left: -16px;
-  margin-right: -16px;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-@media (min-width: 640px) {
-  .refrao-bg {
-    margin-left: -24px;
-    margin-right: -24px;
-    padding-left: 24px;
-    padding-right: 24px;
-  }
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  padding-left: max(16px, calc(50vw - 50%));
+  padding-right: max(16px, calc(50vw - 50%));
+  width: 100vw;
 }
 
 /* Print styles - Layout A4 */
