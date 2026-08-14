@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Search, Plus, X, Printer, Music, RefreshCw } from 'lucide-react'
+import { Search, Plus, X, Printer, Music, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react'
 import { CifraEditor } from '@/components/cifra/CifraEditor'
 import type { Cifra } from '@/types'
 
@@ -20,10 +20,17 @@ export default function RepertorioPage() {
   const [selected, setSelected] = useState<SelectedCifra[]>([])
   const [search, setSearch] = useState('')
   const [showSearch, setShowSearch] = useState(false)
-  const [viewingCifra, setViewingCifra] = useState<SelectedCifra | null>(null)
+  const [viewingIndex, setViewingIndex] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
+
+  // Swipe handling
+  const touchStartX = useRef<number>(0)
+  const touchStartY = useRef<number>(0)
+  const swipeRef = useRef<HTMLDivElement>(null)
+
+  const viewingCifra = viewingIndex !== null ? selected[viewingIndex] : null
 
   const supabase = createClient()
 
@@ -192,6 +199,40 @@ export default function RepertorioPage() {
     window.print()
   }
 
+  // Navigation between cifras
+  function goToNext() {
+    if (viewingIndex !== null && viewingIndex < selected.length - 1) {
+      setViewingIndex(viewingIndex + 1)
+      window.scrollTo(0, 0)
+    }
+  }
+
+  function goToPrev() {
+    if (viewingIndex !== null && viewingIndex > 0) {
+      setViewingIndex(viewingIndex - 1)
+      window.scrollTo(0, 0)
+    }
+  }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX
+    touchStartY.current = e.touches[0].clientY
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current
+
+    // Only trigger swipe if horizontal movement > 80px and more horizontal than vertical
+    if (Math.abs(deltaX) > 80 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+      if (deltaX < 0) {
+        goToNext() // swipe left = next
+      } else {
+        goToPrev() // swipe right = previous
+      }
+    }
+  }
+
   const filteredCifras = allCifras.filter((c) => {
     const q = search.toLowerCase()
     return (
@@ -201,15 +242,45 @@ export default function RepertorioPage() {
   })
 
   // Se está visualizando uma cifra individual
-  if (viewingCifra) {
+  if (viewingCifra && viewingIndex !== null) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <button
-          onClick={() => setViewingCifra(null)}
-          className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-4 no-print"
-        >
-          ← Voltar ao repertório
-        </button>
+      <div
+        className="max-w-4xl mx-auto"
+        ref={swipeRef}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Header de navegação */}
+        <div className="flex items-center justify-between mb-4 no-print">
+          <button
+            onClick={() => setViewingIndex(null)}
+            className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+          >
+            ← Voltar ao repertório
+          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={goToPrev}
+              disabled={viewingIndex === 0}
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 disabled:opacity-30 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Música anterior"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="text-xs text-gray-500 min-w-[3rem] text-center">
+              {viewingIndex + 1} / {selected.length}
+            </span>
+            <button
+              onClick={goToNext}
+              disabled={viewingIndex === selected.length - 1}
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 disabled:opacity-30 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Próxima música"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
         <CifraEditor
           content={viewingCifra.customContent || viewingCifra.cifra.content}
           originalContent={viewingCifra.cifra.content}
@@ -219,20 +290,17 @@ export default function RepertorioPage() {
           sectionRepeats={viewingCifra.sectionRepeats}
           onSave={(newContent) => {
             updateContent(viewingCifra.cifra.id, newContent)
-            setViewingCifra({ ...viewingCifra, customContent: newContent })
           }}
           onRestore={() => {
             updateContent(viewingCifra.cifra.id, viewingCifra.cifra.content)
-            setViewingCifra({ ...viewingCifra, customContent: null, sectionRepeats: {} })
             updateSectionRepeats(viewingCifra.cifra.id, {})
           }}
           onSectionRepeatsChange={(repeats) => {
             updateSectionRepeats(viewingCifra.cifra.id, repeats)
-            setViewingCifra({ ...viewingCifra, sectionRepeats: repeats })
           }}
         />
-        <p className="text-xs text-gray-400 mt-3 no-print">
-          💡 As edições são salvas apenas neste repertório. A cifra original não é alterada.
+        <p className="text-xs text-gray-400 mt-3 no-print text-center">
+          ← Arraste para os lados para navegar entre as músicas →
         </p>
       </div>
     )
@@ -305,7 +373,7 @@ export default function RepertorioPage() {
 
               <div
                 className="flex-1 cursor-pointer"
-                onClick={() => setViewingCifra(item)}
+                onClick={() => setViewingIndex(index)}
               >
                 <h3 className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
                   {item.cifra.title}
