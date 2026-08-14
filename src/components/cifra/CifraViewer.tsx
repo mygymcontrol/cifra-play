@@ -111,7 +111,7 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
         }
       } else if (trimmed.length > 0 && isChordLine(line)) {
         element = (
-          <div key={i} className="chord-line text-primary-600 font-bold whitespace-pre">
+          <div key={i} className="chord-line text-primary-600 whitespace-pre">
             {line}
           </div>
         )
@@ -119,7 +119,7 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
         element = <div key={i} className="whitespace-pre">{'\u00A0'}</div>
       } else {
         element = (
-          <div key={i} className={`whitespace-pre text-gray-900 dark:text-gray-100 ${lineIsRefrao ? 'font-bold' : ''}`}>
+          <div key={i} className="whitespace-pre text-gray-900 dark:text-gray-100">
             {line}
           </div>
         )

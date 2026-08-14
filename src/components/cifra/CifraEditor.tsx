@@ -271,7 +271,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
         )
       } else if (trimmed.length > 0 && isChordLine(line)) {
         element = (
-          <div key={i} className={`chord-line ${color.class} font-bold whitespace-pre`}>
+          <div key={i} className={`chord-line ${color.class} whitespace-pre`}>
             {line}
           </div>
         )
@@ -279,7 +279,7 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
         element = <div key={i} className="whitespace-pre">{'\u00A0'}</div>
       } else {
         element = (
-          <div key={i} className={`whitespace-pre text-gray-900 dark:text-gray-100 ${lineIsRefrao ? 'font-bold' : ''}`}>
+          <div key={i} className="whitespace-pre text-gray-900 dark:text-gray-100">
             {line}
           </div>
         )
