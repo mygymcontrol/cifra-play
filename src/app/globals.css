@@ -32,6 +32,7 @@
   }
   body {
     @apply bg-white text-gray-900 antialiased;
+    overflow-x: hidden;
   }
 }
 
@@ -77,22 +78,22 @@
   }
 }
 
-/* Fundo do refrão - wrapper block-level separado do conteúdo pre */
+/* Fundo do refrão - full-bleed com 100vw */
 .refrao-bg {
-  display: block;
-  width: calc(100% + 24px);
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
   background-color: rgba(239, 68, 68, 0.06);
-  margin-left: -12px;
-  margin-right: -12px;
   padding-left: 12px;
   padding-right: 12px;
+  box-sizing: border-box;
 }
 
 @media (min-width: 640px) {
   .refrao-bg {
-    width: calc(100% + 48px);
-    margin-left: -24px;
-    margin-right: -24px;
     padding-left: 24px;
     padding-right: 24px;
   }
