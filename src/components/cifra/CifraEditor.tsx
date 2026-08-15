@@ -378,15 +378,35 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
     if (currentGroup) groups.push(currentGroup)
     
     const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+
+    const SECTION_BORDER_COLORS: Record<string, string> = {
+      red: 'rgba(239, 68, 68, 0.4)',
+      green: 'rgba(34, 197, 94, 0.4)',
+      blue: 'rgba(59, 130, 246, 0.4)',
+      yellow: 'rgba(234, 179, 8, 0.4)',
+    }
+
+    const SECTION_BORDER_COLORS_DARK: Record<string, string> = {
+      red: 'rgba(239, 68, 68, 0.5)',
+      green: 'rgba(34, 197, 94, 0.5)',
+      blue: 'rgba(59, 130, 246, 0.5)',
+      yellow: 'rgba(234, 179, 8, 0.5)',
+    }
     
     return groups.map((group, gi) => {
       let style: React.CSSProperties = {}
       if (group.bgColor) {
+        const borderColor = isDark ? (SECTION_BORDER_COLORS_DARK[group.bgColor] || '') : (SECTION_BORDER_COLORS[group.bgColor] || '')
         style.backgroundColor = isDark ? (SECTION_BG_COLORS_DARK[group.bgColor] || '') : (SECTION_BG_COLORS[group.bgColor] || '')
         style.marginLeft = '-4px'
         style.marginRight = '-4px'
         style.paddingLeft = '4px'
         style.paddingRight = '4px'
+        style.borderLeft = `2px solid ${borderColor}`
+        style.borderRight = `2px solid ${borderColor}`
+        style.borderTop = `1px solid ${borderColor}`
+        style.borderBottom = `1px solid ${borderColor}`
+        style.borderRadius = '4px'
       }
       return (
         <div key={gi} className={group.isRefrao && !group.bgColor ? 'refrao-bg' : ''} style={style}>
