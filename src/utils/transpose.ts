@@ -1,7 +1,7 @@
 const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 const FLAT_NOTES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
 
-// Regex to match chords in text
+// Regex to match chords in text - only at word boundaries
 const CHORD_REGEX = /\b([A-G][#b]?)(m|dim|aug|sus[24]?|maj|add|[0-9]*)([\/][A-G][#b]?)?\b/g
 
 function noteIndex(note: string): number {
@@ -34,11 +34,22 @@ export function transposeLine(line: string, semitones: number): string {
   return line.replace(CHORD_REGEX, (match) => transposeChord(match, semitones))
 }
 
+import { isChordLine } from './chord-detection'
+import { isSectionLine } from './section-detection'
+
 export function transposeContent(content: string, semitones: number): string {
   if (semitones === 0) return content
   return content
     .split('\n')
-    .map((line) => transposeLine(line, semitones))
+    .map((line) => {
+      const trimmed = line.trim()
+      // Só transpõe linhas de acorde, linhas de seção (que podem ter acordes), ou linhas com TOM/INTRO
+      if (isChordLine(line) || isSectionLine(line) || /^TOM:/i.test(trimmed) || /^INSTRUMENTAL/i.test(trimmed)) {
+        return transposeLine(line, semitones)
+      }
+      // Linha de texto/letra — não transpõe
+      return line
+    })
     .join('\n')
 }
 
