@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
-import { Search, Plus, X } from 'lucide-react'
+import { Search, Plus, X, RefreshCw } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { Cifra } from '@/types'
 
@@ -10,7 +10,13 @@ export default function BibliotecaPage() {
   const [cifras, setCifras] = useState<Cifra[]>([])
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const supabase = createClient()
+
+  // Pull-to-refresh
+  const pullStartY = useRef(0)
+  const [pullDistance, setPullDistance] = useState(0)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     loadCifras()
@@ -24,6 +30,35 @@ export default function BibliotecaPage() {
 
     setCifras(data || [])
     setLoading(false)
+  }
+
+  async function handleRefresh() {
+    setRefreshing(true)
+    await loadCifras()
+    setRefreshing(false)
+    setPullDistance(0)
+  }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    if (window.scrollY === 0) {
+      pullStartY.current = e.touches[0].clientY
+    }
+  }
+
+  function handleTouchMove(e: React.TouchEvent) {
+    if (window.scrollY > 0 || refreshing) return
+    const distance = e.touches[0].clientY - pullStartY.current
+    if (distance > 0 && distance < 150) {
+      setPullDistance(distance)
+    }
+  }
+
+  function handleTouchEnd() {
+    if (pullDistance > 80) {
+      handleRefresh()
+    } else {
+      setPullDistance(0)
+    }
   }
 
   const filtered = cifras.filter((c) => {
@@ -40,16 +75,43 @@ export default function BibliotecaPage() {
   }
 
   return (
-    <div>
+    <div
+      ref={containerRef}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Pull-to-refresh indicator */}
+      {pullDistance > 0 && (
+        <div className="flex justify-center py-2 transition-all" style={{ height: `${pullDistance * 0.5}px` }}>
+          <RefreshCw className={`w-5 h-5 text-primary-500 ${pullDistance > 80 ? 'animate-spin' : ''}`} style={{ transform: `rotate(${pullDistance * 2}deg)` }} />
+        </div>
+      )}
+      {refreshing && (
+        <div className="flex justify-center py-3">
+          <RefreshCw className="w-5 h-5 text-primary-500 animate-spin" />
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Biblioteca</h1>
-        <Link
-          href="/cifras/nova"
-          className="inline-flex items-center gap-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="p-2 text-gray-500 hover:text-primary-600 transition-colors disabled:opacity-50"
+            title="Atualizar"
+          >
+            <RefreshCw className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
+          </button>
+          <Link
+            href="/cifras/nova"
+            className="inline-flex items-center gap-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
           Nova Cifra
         </Link>
+        </div>
       </div>
 
       {/* Busca */}
