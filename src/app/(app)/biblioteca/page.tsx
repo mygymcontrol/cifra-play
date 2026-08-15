@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Search, Plus, X, RefreshCw } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { Cifra } from '@/types'
@@ -11,6 +12,7 @@ export default function BibliotecaPage() {
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
@@ -33,7 +35,11 @@ export default function BibliotecaPage() {
       .from('cifras')
       .select('*')
       .order('title', { ascending: true })
-    setCifras(data || [])
+      .limit(1000)
+    if (data) {
+      setCifras(data)
+    }
+    router.refresh()
     setRefreshing(false)
   }
 
