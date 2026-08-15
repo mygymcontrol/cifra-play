@@ -116,6 +116,28 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.35);
 }
 
+/* Fundo da ponte */
+.ponte-bg {
+  background-color: rgba(59, 130, 246, 0.06);
+  margin-left: -4px;
+  margin-right: -4px;
+  padding-left: 4px;
+  padding-right: 4px;
+  border-left: 2px solid rgba(59, 130, 246, 0.3);
+  border-right: 2px solid rgba(59, 130, 246, 0.3);
+  border-top: 1px solid rgba(59, 130, 246, 0.3);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 4px;
+}
+
+:is(.dark) .ponte-bg {
+  background-color: rgba(59, 130, 246, 0.15);
+  border-left: 2px solid rgba(59, 130, 246, 0.35);
+  border-right: 2px solid rgba(59, 130, 246, 0.35);
+  border-top: 1px solid rgba(59, 130, 246, 0.35);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.35);
+}
+
 @media (min-width: 640px) {
   .refrao-bg {
     margin-left: -24px;

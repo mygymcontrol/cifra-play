@@ -35,16 +35,19 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
   function renderContent(text: string) {
     const lines = text.split('\n')
     
-    // PASSO 1: Determinar quais linhas pertencem ao refrão
+    // PASSO 1: Determinar quais linhas pertencem ao refrão ou ponte
     const isRefraoLine: boolean[] = new Array(lines.length).fill(false)
+    const isPonteLine: boolean[] = new Array(lines.length).fill(false)
     let inRefrao = false
+    let inPonte = false
     
     for (let i = 0; i < lines.length; i++) {
       const isEmpty = !lines[i] || lines[i].match(/^\s*$/)
       
-      // Linha vazia/whitespace = encerra refrão
+      // Linha vazia/whitespace = encerra seção
       if (isEmpty) {
         inRefrao = false
+        inPonte = false
         continue
       }
       
@@ -52,16 +55,19 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
       const sectionMatch = lines[i].trim().match(/^\[([^\]]+)\]/)
       if (sectionMatch) {
         inRefrao = /refrão|refrao|coro/i.test(sectionMatch[1])
+        inPonte = /ponte|bridge/i.test(sectionMatch[1])
       } else if (isSectionLine(lines[i])) {
         inRefrao = /refrão|refrao|coro/i.test(lines[i])
+        inPonte = /ponte|bridge/i.test(lines[i])
       }
       
       isRefraoLine[i] = inRefrao
+      isPonteLine[i] = inPonte
     }
     
-    // PASSO 2: Agrupar linhas consecutivas com mesmo estado de refrão
-    const groups: { isRefrao: boolean; elements: React.ReactNode[] }[] = []
-    let currentGroup: { isRefrao: boolean; elements: React.ReactNode[] } | null = null
+    // PASSO 2: Agrupar linhas consecutivas com mesmo estado de refrão/ponte
+    const groups: { isRefrao: boolean; isPonte: boolean; elements: React.ReactNode[] }[] = []
+    let currentGroup: { isRefrao: boolean; isPonte: boolean; elements: React.ReactNode[] } | null = null
     let prevWasEmpty = false
     
     for (let i = 0; i < lines.length; i++) {
@@ -129,9 +135,9 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
       }
       
       // Agrupar
-      if (!currentGroup || currentGroup.isRefrao !== lineIsRefrao) {
+      if (!currentGroup || currentGroup.isRefrao !== lineIsRefrao || currentGroup.isPonte !== isPonteLine[i]) {
         if (currentGroup) groups.push(currentGroup)
-        currentGroup = { isRefrao: lineIsRefrao, elements: [element] }
+        currentGroup = { isRefrao: lineIsRefrao, isPonte: isPonteLine[i], elements: [element] }
       } else {
         currentGroup.elements.push(element)
       }
@@ -140,7 +146,7 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
     if (currentGroup) groups.push(currentGroup)
     
     return groups.map((group, gi) => (
-      <div key={gi} className={group.isRefrao ? 'refrao-bg' : ''}>
+      <div key={gi} className={group.isRefrao ? 'refrao-bg' : group.isPonte ? 'ponte-bg' : ''}>
         {group.elements}
       </div>
     ))
