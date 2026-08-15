@@ -11,7 +11,6 @@ export default function LoginPage() {
   const router = useRouter()
   const supabase = createClient()
 
-  // Senha padrão interna — segurança é pela lista de emails autorizados
   const DEFAULT_PASSWORD = 'cifra-play-2024-access'
 
   async function handleLogin(e: React.FormEvent) {
@@ -21,55 +20,32 @@ export default function LoginPage() {
 
     const normalizedEmail = email.toLowerCase().trim()
 
-    // Verificar se o e-mail está autorizado
-    const { data: allowed } = await supabase
-      .from('allowed_emails')
-      .select('id')
-      .eq('email', normalizedEmail)
-      .single()
+    // Chamar API que verifica email, cria/atualiza usuario
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: normalizedEmail }),
+    })
 
-    if (!allowed) {
-      setError('Este e-mail não está autorizado. Entre em contato com o administrador.')
+    if (!res.ok) {
+      const data = await res.json()
+      setError(data.error || 'Erro ao acessar.')
       setLoading(false)
       return
     }
 
-    // Tentar fazer login
+    // Agora fazer login com a senha padrão
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: normalizedEmail,
       password: DEFAULT_PASSWORD,
     })
 
     if (signInError) {
-      // Se não conseguiu logar, tenta criar a conta (primeiro acesso)
-      const { error: signUpError } = await supabase.auth.signUp({
-        email: normalizedEmail,
-        password: DEFAULT_PASSWORD,
-        options: {
-          data: { full_name: normalizedEmail.split('@')[0] },
-        },
-      })
-
-      if (signUpError) {
-        setError('Erro ao acessar. Tente novamente.')
-        setLoading(false)
-        return
-      }
-
-      // Logar após criar
-      const { error: loginError } = await supabase.auth.signInWithPassword({
-        email: normalizedEmail,
-        password: DEFAULT_PASSWORD,
-      })
-
-      if (loginError) {
-        setError('Conta criada. Verifique seu e-mail para confirmar o acesso.')
-        setLoading(false)
-        return
-      }
+      setError('Erro ao entrar. Tente novamente.')
+      setLoading(false)
+      return
     }
 
-    // Login bem-sucedido
     router.push('/')
     router.refresh()
   }
