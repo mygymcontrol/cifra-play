@@ -1,14 +1,18 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [sent, setSent] = useState(false)
+  const router = useRouter()
   const supabase = createClient()
+
+  // Senha padrão interna — segurança é pela lista de emails autorizados
+  const DEFAULT_PASSWORD = 'cifra-play-2024-access'
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -30,44 +34,44 @@ export default function LoginPage() {
       return
     }
 
-    // Enviar Magic Link
-    const { error } = await supabase.auth.signInWithOtp({
+    // Tentar fazer login
+    const { error: signInError } = await supabase.auth.signInWithPassword({
       email: normalizedEmail,
-      options: {
-        emailRedirectTo: `${window.location.origin}/`,
-      },
+      password: DEFAULT_PASSWORD,
     })
 
-    if (error) {
-      setError(error.message)
-    } else {
-      setSent(true)
-    }
-    setLoading(false)
-  }
+    if (signInError) {
+      // Se não conseguiu logar, tenta criar a conta (primeiro acesso)
+      const { error: signUpError } = await supabase.auth.signUp({
+        email: normalizedEmail,
+        password: DEFAULT_PASSWORD,
+        options: {
+          data: { full_name: normalizedEmail.split('@')[0] },
+        },
+      })
 
-  if (sent) {
-    return (
-      <div className="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700 text-center">
-        <div className="flex justify-center mb-6">
-          <img src="/icon-cifra-play.png" alt="Cifra Play" className="w-20 h-20 rounded-2xl" />
-        </div>
-        <h1 className="text-xl font-bold text-white mb-4">Verifique seu e-mail</h1>
-        <p className="text-gray-300 mb-2">
-          Enviamos um link de acesso para:
-        </p>
-        <p className="text-primary-400 font-medium mb-6">{email}</p>
-        <p className="text-sm text-gray-400">
-          Clique no link no e-mail para entrar no app. Verifique a caixa de spam se não encontrar.
-        </p>
-        <button
-          onClick={() => setSent(false)}
-          className="mt-6 text-sm text-gray-400 hover:text-white transition-colors"
-        >
-          ← Tentar outro e-mail
-        </button>
-      </div>
-    )
+      if (signUpError) {
+        setError('Erro ao acessar. Tente novamente.')
+        setLoading(false)
+        return
+      }
+
+      // Logar após criar
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password: DEFAULT_PASSWORD,
+      })
+
+      if (loginError) {
+        setError('Conta criada. Verifique seu e-mail para confirmar o acesso.')
+        setLoading(false)
+        return
+      }
+    }
+
+    // Login bem-sucedido
+    router.push('/')
+    router.refresh()
   }
 
   return (
@@ -79,7 +83,7 @@ export default function LoginPage() {
         Cifra Play
       </h1>
       <p className="text-center text-gray-400 mb-6 text-sm">
-        Digite seu e-mail para receber o link de acesso
+        Digite seu e-mail para acessar
       </p>
 
       <form onSubmit={handleLogin} className="space-y-4">
@@ -107,7 +111,7 @@ export default function LoginPage() {
           disabled={loading}
           className="w-full py-2.5 px-4 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors"
         >
-          {loading ? 'Enviando...' : 'Enviar link de acesso'}
+          {loading ? 'Entrando...' : 'Entrar'}
         </button>
       </form>
     </div>
