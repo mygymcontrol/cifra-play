@@ -163,6 +163,26 @@ export interface Database {
           section_repeats?: Record<string, number>
         }
       }
+      allowed_emails: {
+        Row: {
+          id: string
+          created_at: string
+          email: string
+          name: string | null
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          email: string
+          name?: string | null
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          email?: string
+          name?: string | null
+        }
+      }
     }
     Views: {
       [_ in never]: never

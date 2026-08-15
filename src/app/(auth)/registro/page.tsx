@@ -19,6 +19,19 @@ export default function RegistroPage() {
     setLoading(true)
     setError(null)
 
+    // Verificar se o e-mail está autorizado
+    const { data: allowed } = await supabase
+      .from('allowed_emails')
+      .select('id')
+      .eq('email', email.toLowerCase().trim())
+      .single()
+
+    if (!allowed) {
+      setError('Este e-mail não está autorizado. Entre em contato com o administrador.')
+      setLoading(false)
+      return
+    }
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
