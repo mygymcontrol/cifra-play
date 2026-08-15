@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Search, Plus, X, RefreshCw } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -12,11 +12,6 @@ export default function BibliotecaPage() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const supabase = createClient()
-
-  // Pull-to-refresh
-  const pullStartY = useRef(0)
-  const [pullDistance, setPullDistance] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     loadCifras()
@@ -34,31 +29,12 @@ export default function BibliotecaPage() {
 
   async function handleRefresh() {
     setRefreshing(true)
-    await loadCifras()
+    const { data } = await supabase
+      .from('cifras')
+      .select('*')
+      .order('title', { ascending: true })
+    setCifras(data || [])
     setRefreshing(false)
-    setPullDistance(0)
-  }
-
-  function handleTouchStart(e: React.TouchEvent) {
-    if (window.scrollY === 0) {
-      pullStartY.current = e.touches[0].clientY
-    }
-  }
-
-  function handleTouchMove(e: React.TouchEvent) {
-    if (window.scrollY > 0 || refreshing) return
-    const distance = e.touches[0].clientY - pullStartY.current
-    if (distance > 0 && distance < 150) {
-      setPullDistance(distance)
-    }
-  }
-
-  function handleTouchEnd() {
-    if (pullDistance > 80) {
-      handleRefresh()
-    } else {
-      setPullDistance(0)
-    }
   }
 
   const filtered = cifras.filter((c) => {
@@ -75,18 +51,7 @@ export default function BibliotecaPage() {
   }
 
   return (
-    <div
-      ref={containerRef}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
-      {/* Pull-to-refresh indicator */}
-      {pullDistance > 0 && (
-        <div className="flex justify-center py-2 transition-all" style={{ height: `${pullDistance * 0.5}px` }}>
-          <RefreshCw className={`w-5 h-5 text-primary-500 ${pullDistance > 80 ? 'animate-spin' : ''}`} style={{ transform: `rotate(${pullDistance * 2}deg)` }} />
-        </div>
-      )}
+    <div>
       {refreshing && (
         <div className="flex justify-center py-3">
           <RefreshCw className="w-5 h-5 text-primary-500 animate-spin" />
