@@ -37,15 +37,15 @@ export function transposeLine(line: string, semitones: number): string {
   const brackets: string[] = []
   let protectedLine = line.replace(/\[[^\]]+\]/g, (match) => {
     brackets.push(match)
-    return `\x00BRACKET${brackets.length - 1}\x00`
+    return `\u2800\u2801${brackets.length - 1}\u2802`
   })
   
-  // Protege palavras-chave de seção que aparecem sem colchetes
+  // Protege palavras-chave de seção que aparecem sem colchetes (ex: 2XREFRÃO, PRE-REFRÃO, INSTRUMENTAL)
   const sectionKeywords: string[] = []
-  const sectionKeywordRegex = /(?:^|\s)(\d+x\s*)?(?:INTRO|INTRODUÇÃO|VERSO|PRÉ-REFRÃO|PRE-REFRÃO|REFRÃO|PONTE|BRIDGE|SOLO|INTERLÚDIO|INTERLUDIO|INSTRUMENTAL|FINAL|CODA|OUTR[OA]|CORO|RAMPA|TOM:)/gi
+  const sectionKeywordRegex = /(?:\d+[xX]\s*)?(?:INTRO|INTRODUÇÃO|VERSO|PRÉ-REFRÃO|PRE-REFRÃO|REFRÃO|PONTE|BRIDGE|SOLO|INTERLÚDIO|INTERLUDIO|INSTRUMENTAL|FINAL|CODA|OUTR[OA]|CORO|RAMPA|TOM:|PRIMEIRA PARTE|SEGUNDA PARTE|TERCEIRA PARTE)/gi
   protectedLine = protectedLine.replace(sectionKeywordRegex, (match) => {
     sectionKeywords.push(match)
-    return `\x00SECTION${sectionKeywords.length - 1}\x00`
+    return `\u2800\u2803${sectionKeywords.length - 1}\u2802`
   })
   
   // Trata ':' como separador de acordes (ex: D/F#:G = D/F# seguido de G)
@@ -54,8 +54,8 @@ export function transposeLine(line: string, semitones: number): string {
   }).join(':')
   
   // Restaura os placeholders
-  let result = transposed.replace(/\x00BRACKET(\d+)\x00/g, (_, idx) => brackets[parseInt(idx)])
-  result = result.replace(/\x00SECTION(\d+)\x00/g, (_, idx) => sectionKeywords[parseInt(idx)])
+  let result = transposed.replace(/\u2800\u2801(\d+)\u2802/g, (_, idx) => brackets[parseInt(idx)])
+  result = result.replace(/\u2800\u2803(\d+)\u2802/g, (_, idx) => sectionKeywords[parseInt(idx)])
   return result
 }
 
