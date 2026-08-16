@@ -1,8 +1,9 @@
 const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 const FLAT_NOTES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
 
-// Regex to match chords in text - only at word boundaries
-const CHORD_REGEX = /\b([A-G][#b]?)([mM]|[dD][iI][mM]|[aA][uU][gG]|[sS][uU][sS][24]?|[mM][aA][jJ]|[aA][dD][dD]|[0-9]*)([\/][A-G][#b]?)?\b/g
+// Regex to match chords in text
+// Usa lookahead para não capturar letras de palavras
+const CHORD_REGEX = /(?<![a-z])([A-G][#b]?)([mM]|[dD][iI][mM]|[aA][uU][gG]|[sS][uU][sS][24]?|[mM][aA][jJ]|[aA][dD][dD]|[0-9]*)(\/[A-G][#b]?)?(?![a-z])/g
 
 function noteIndex(note: string): number {
   let idx = NOTES.indexOf(note)
