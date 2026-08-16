@@ -131,11 +131,11 @@
 }
 
 :is(.dark) .ponte-bg {
-  background-color: rgba(59, 130, 246, 0.15);
-  border-left: 2px solid rgba(59, 130, 246, 0.35);
-  border-right: 2px solid rgba(59, 130, 246, 0.35);
-  border-top: 1px solid rgba(59, 130, 246, 0.35);
-  border-bottom: 1px solid rgba(59, 130, 246, 0.35);
+  background-color: rgba(96, 165, 250, 0.12);
+  border-left: 2px solid rgba(96, 165, 250, 0.4);
+  border-right: 2px solid rgba(96, 165, 250, 0.4);
+  border-top: 1px solid rgba(96, 165, 250, 0.4);
+  border-bottom: 1px solid rgba(96, 165, 250, 0.4);
 }
 
 /* Fundo do coro */
@@ -153,11 +153,11 @@
 }
 
 :is(.dark) .coro-bg {
-  background-color: rgba(234, 179, 8, 0.15);
-  border-left: 2px solid rgba(234, 179, 8, 0.35);
-  border-right: 2px solid rgba(234, 179, 8, 0.35);
-  border-top: 1px solid rgba(234, 179, 8, 0.35);
-  border-bottom: 1px solid rgba(234, 179, 8, 0.35);
+  background-color: rgba(253, 224, 71, 0.10);
+  border-left: 2px solid rgba(253, 224, 71, 0.35);
+  border-right: 2px solid rgba(253, 224, 71, 0.35);
+  border-top: 1px solid rgba(253, 224, 71, 0.35);
+  border-bottom: 1px solid rgba(253, 224, 71, 0.35);
 }
 
 @media (min-width: 640px) {

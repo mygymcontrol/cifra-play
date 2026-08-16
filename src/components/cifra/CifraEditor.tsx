@@ -110,8 +110,8 @@ export function CifraEditor({ content, originalContent, originalTom, initialTran
   const SECTION_BG_COLORS_DARK: Record<string, string> = {
     red: 'rgba(239, 68, 68, 0.15)',
     green: 'rgba(34, 197, 94, 0.15)',
-    blue: 'rgba(59, 130, 246, 0.15)',
-    yellow: 'rgba(234, 179, 8, 0.15)',
+    blue: 'rgba(96, 165, 250, 0.12)',
+    yellow: 'rgba(253, 224, 71, 0.10)',
   }
 
   function insertSection(sectionName: string) {
@@ -401,8 +401,8 @@ export function CifraEditor({ content, originalContent, originalTom, initialTran
     const SECTION_BORDER_COLORS_DARK: Record<string, string> = {
       red: 'rgba(239, 68, 68, 0.5)',
       green: 'rgba(34, 197, 94, 0.5)',
-      blue: 'rgba(59, 130, 246, 0.5)',
-      yellow: 'rgba(234, 179, 8, 0.5)',
+      blue: 'rgba(96, 165, 250, 0.4)',
+      yellow: 'rgba(253, 224, 71, 0.35)',
     }
     
     return groups.map((group, gi) => {
