@@ -31,7 +31,11 @@ export function transposeChord(chord: string, semitones: number): string {
 
 export function transposeLine(line: string, semitones: number): string {
   if (semitones === 0) return line
-  return line.replace(CHORD_REGEX, (match) => transposeChord(match, semitones))
+  // Trata ':' como separador de acordes (ex: D/F#:G = D/F# seguido de G)
+  // Divide por ':' mantendo posições, transpõe cada parte, rejunta
+  return line.split(':').map(part => {
+    return part.replace(CHORD_REGEX, (match) => transposeChord(match, semitones))
+  }).join(':')
 }
 
 import { isChordLine } from './chord-detection'
