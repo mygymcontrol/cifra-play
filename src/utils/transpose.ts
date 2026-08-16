@@ -32,11 +32,31 @@ export function transposeChord(chord: string, semitones: number): string {
 
 export function transposeLine(line: string, semitones: number): string {
   if (semitones === 0) return line
+  
+  // Protege conteúdo dentro de colchetes [SEÇÃO] para não transpor letras do nome
+  const brackets: string[] = []
+  let protectedLine = line.replace(/\[[^\]]+\]/g, (match) => {
+    brackets.push(match)
+    return `\x00BRACKET${brackets.length - 1}\x00`
+  })
+  
+  // Protege palavras-chave de seção que aparecem sem colchetes
+  const sectionKeywords: string[] = []
+  const sectionKeywordRegex = /(?:^|\s)(\d+x\s*)?(?:INTRO|INTRODUÇÃO|VERSO|PRÉ-REFRÃO|PRE-REFRÃO|REFRÃO|PONTE|BRIDGE|SOLO|INTERLÚDIO|INTERLUDIO|INSTRUMENTAL|FINAL|CODA|OUTR[OA]|CORO|RAMPA|TOM:)/gi
+  protectedLine = protectedLine.replace(sectionKeywordRegex, (match) => {
+    sectionKeywords.push(match)
+    return `\x00SECTION${sectionKeywords.length - 1}\x00`
+  })
+  
   // Trata ':' como separador de acordes (ex: D/F#:G = D/F# seguido de G)
-  // Divide por ':' mantendo posições, transpõe cada parte, rejunta
-  return line.split(':').map(part => {
+  const transposed = protectedLine.split(':').map(part => {
     return part.replace(CHORD_REGEX, (match) => transposeChord(match, semitones))
   }).join(':')
+  
+  // Restaura os placeholders
+  let result = transposed.replace(/\x00BRACKET(\d+)\x00/g, (_, idx) => brackets[parseInt(idx)])
+  result = result.replace(/\x00SECTION(\d+)\x00/g, (_, idx) => sectionKeywords[parseInt(idx)])
+  return result
 }
 
 import { isChordLine } from './chord-detection'
