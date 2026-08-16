@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Search, Plus, X, Printer, Music, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react'
 import { CifraEditor } from '@/components/cifra/CifraEditor'
+import { getSemitonesBetween } from '@/utils/transpose'
 import type { Cifra } from '@/types'
 
 interface SelectedCifra {
@@ -303,9 +304,15 @@ export default function RepertorioPage() {
         </div>
 
         <CifraEditor
+          key={viewingCifra.cifra.id}
           content={viewingCifra.customContent || viewingCifra.cifra.content}
           originalContent={viewingCifra.cifra.content}
-          originalTom={viewingCifra.customTom || viewingCifra.cifra.tom}
+          originalTom={viewingCifra.cifra.tom}
+          initialTranspose={
+            viewingCifra.customTom && viewingCifra.cifra.tom
+              ? getSemitonesBetween(viewingCifra.cifra.tom, viewingCifra.customTom)
+              : 0
+          }
           title={viewingCifra.cifra.title}
           artist={viewingCifra.cifra.artist}
           sectionRepeats={viewingCifra.sectionRepeats}
@@ -313,8 +320,12 @@ export default function RepertorioPage() {
           onSave={(newContent) => {
             updateContent(viewingCifra.cifra.id, newContent)
           }}
+          onTomChange={(newTom) => {
+            updateTom(viewingCifra.cifra.id, newTom)
+          }}
           onRestore={() => {
             updateContent(viewingCifra.cifra.id, viewingCifra.cifra.content)
+            updateTom(viewingCifra.cifra.id, viewingCifra.cifra.tom || '')
             updateSectionRepeats(viewingCifra.cifra.id, {})
             updateSectionColors(viewingCifra.cifra.id, {})
           }}

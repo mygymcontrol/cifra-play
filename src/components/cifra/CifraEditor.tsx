@@ -21,9 +21,11 @@ interface CifraEditorProps {
   content: string
   originalContent: string
   originalTom: string | null
+  initialTranspose?: number
   title?: string
   artist?: string
   onSave: (newContent: string) => void
+  onTomChange?: (newTom: string) => void
   onRestore: () => void
   sectionRepeats?: Record<number, number>
   onSectionRepeatsChange?: (repeats: Record<number, number>) => void
@@ -31,8 +33,8 @@ interface CifraEditorProps {
   onSectionColorsChange?: (colors: Record<number, string>) => void
 }
 
-export function CifraEditor({ content, originalContent, originalTom, title, artist, onSave, onRestore, sectionRepeats: savedRepeats, onSectionRepeatsChange, sectionColors: savedColors, onSectionColorsChange }: CifraEditorProps) {
-  const [transpose, setTranspose] = useState(0)
+export function CifraEditor({ content, originalContent, originalTom, initialTranspose, title, artist, onSave, onTomChange, onRestore, sectionRepeats: savedRepeats, onSectionRepeatsChange, sectionColors: savedColors, onSectionColorsChange }: CifraEditorProps) {
+  const [transpose, setTranspose] = useState(initialTranspose || 0)
   const [fontSize, setFontSize] = useState(8)
   const [editing, setEditing] = useState(false)
   const [editContent, setEditContent] = useState(content)
@@ -437,14 +439,28 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
             <span className={`text-sm font-bold ${color.class}`}>{currentTom}</span>
           )}
           <button
-            onClick={() => setTranspose((t) => t - 1)}
+            onClick={() => {
+              const newT = transpose - 1
+              setTranspose(newT)
+              if (onTomChange && originalTom) {
+                const newTom = NOTES[(NOTES.indexOf(originalTom as any) + newT + 1200) % 12]
+                onTomChange(newTom)
+              }
+            }}
             className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white hover:bg-gray-50"
             aria-label="Diminuir tom"
           >
             <Minus className="w-3 h-3" />
           </button>
           <button
-            onClick={() => setTranspose((t) => t + 1)}
+            onClick={() => {
+              const newT = transpose + 1
+              setTranspose(newT)
+              if (onTomChange && originalTom) {
+                const newTom = NOTES[(NOTES.indexOf(originalTom as any) + newT + 1200) % 12]
+                onTomChange(newTom)
+              }
+            }}
             className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white hover:bg-gray-50"
             aria-label="Aumentar tom"
           >
@@ -452,7 +468,12 @@ export function CifraEditor({ content, originalContent, originalTom, title, arti
           </button>
           {transpose !== 0 && (
             <button
-              onClick={() => setTranspose(0)}
+              onClick={() => {
+                setTranspose(0)
+                if (onTomChange && originalTom) {
+                  onTomChange(originalTom)
+                }
+              }}
               className="text-xs text-gray-500 hover:underline"
               aria-label="Resetar tom"
             >
