@@ -54,17 +54,24 @@ export default function RepertorioPage() {
 
     // Load repertorio: try remote first, fallback to local
     if (user) {
-      const loaded = await loadFromRemote(user.id)
-      if (!loaded) {
-        loadFromLocal()
+      const remoteItems = await loadFromRemote(user.id)
+      if (remoteItems !== null) {
+        // Remote loaded successfully (even if empty)
+        setSelected(remoteItems)
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(remoteItems))
+      } else {
+        // Remote failed (offline) — use local
+        const localItems = loadFromLocal()
+        setSelected(localItems)
       }
     } else {
-      loadFromLocal()
+      const localItems = loadFromLocal()
+      setSelected(localItems)
     }
     setLoading(false)
   }
 
-  async function loadFromRemote(uid: string): Promise<boolean> {
+  async function loadFromRemote(uid: string): Promise<SelectedCifra[] | null> {
     try {
       const { data, error } = await supabase
         .from('repertorio_items')
@@ -72,9 +79,9 @@ export default function RepertorioPage() {
         .eq('user_id', uid)
         .order('order', { ascending: true })
 
-      if (error || !data || data.length === 0) return false
+      if (error) return null
 
-      const items: SelectedCifra[] = data
+      const items: SelectedCifra[] = (data || [])
         .filter((item: any) => item.cifra)
         .map((item: any) => ({
           cifra: item.cifra as Cifra,
@@ -84,22 +91,35 @@ export default function RepertorioPage() {
           sectionColors: ((item as any).section_colors as Record<number, string>) || {},
         }))
 
-      setSelected(items)
-      // Update local cache
-      localStorage.setItem(LOCAL_KEY, JSON.stringify(items))
-      return true
+      // Deduplica por cifra_id
+      const seen = new Set<string>()
+      const deduped = items.filter(item => {
+        if (seen.has(item.cifra.id)) return false
+        seen.add(item.cifra.id)
+        return true
+      })
+
+      return deduped
     } catch {
-      return false
+      return null
     }
   }
 
-  function loadFromLocal() {
+  function loadFromLocal(): SelectedCifra[] {
     const saved = localStorage.getItem(LOCAL_KEY)
     if (saved) {
       try {
-        setSelected(JSON.parse(saved))
+        const items: SelectedCifra[] = JSON.parse(saved)
+        // Deduplica por cifra_id
+        const seen = new Set<string>()
+        return items.filter(item => {
+          if (seen.has(item.cifra.id)) return false
+          seen.add(item.cifra.id)
+          return true
+        })
       } catch {}
     }
+    return []
   }
 
   // Save to localStorage and sync to remote
@@ -202,7 +222,11 @@ export default function RepertorioPage() {
   async function forceSync() {
     if (!userId) return
     setSyncing(true)
-    await loadFromRemote(userId)
+    const remoteItems = await loadFromRemote(userId)
+    if (remoteItems !== null) {
+      setSelected(remoteItems)
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(remoteItems))
+    }
     setSyncing(false)
   }
 
