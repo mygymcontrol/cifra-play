@@ -223,42 +223,52 @@ export function CifraEditor({ content, originalContent, originalTom, initialTran
   function renderContent(text: string) {
     const lines = text.split('\n')
     
-    // PASSO 1: Determinar quais linhas pertencem ao refrão, ponte, coro ou seção com cor
+    function detectSectionType(text: string) {
+      const isPre = /pr[ée]\s*-?\s*refr[ãa]o/i.test(text)
+      return {
+        prerefrao: isPre,
+        refrao: !isPre && /refr[ãa]o/i.test(text),
+        ponte: /ponte|bridge/i.test(text),
+        coro: /coro/i.test(text),
+      }
+    }
+
+    // PASSO 1: Determinar quais linhas pertencem a cada tipo de seção ou cor customizada
     const isRefraoArr: boolean[] = new Array(lines.length).fill(false)
     const isPonteArr: boolean[] = new Array(lines.length).fill(false)
     const isCoroArr: boolean[] = new Array(lines.length).fill(false)
+    const isPreRefraoArr: boolean[] = new Array(lines.length).fill(false)
     const lineSectionColor: (string | null)[] = new Array(lines.length).fill(null)
     let refrao = false
     let ponte = false
     let coro = false
+    let prerefrao = false
     let currentSectionColor: string | null = null
     let currentSectionLineIdx: number | null = null
     
     for (let i = 0; i < lines.length; i++) {
       const isEmpty = !lines[i] || /^\s*$/.test(lines[i])
-      if (isEmpty) { refrao = false; ponte = false; coro = false; currentSectionColor = null; currentSectionLineIdx = null; continue }
+      if (isEmpty) { refrao = false; ponte = false; coro = false; prerefrao = false; currentSectionColor = null; currentSectionLineIdx = null; continue }
       const sm = lines[i].trim().match(/^\[([^\]]+)\]/)
-      if (sm) {
-        refrao = /refrão|refrao/i.test(sm[1]) && !/coro/i.test(sm[1])
-        ponte = /ponte|bridge/i.test(sm[1])
-        coro = /coro/i.test(sm[1])
-        currentSectionLineIdx = i
-        currentSectionColor = sectionColors[i] || null
-      } else if (isSectionLine(lines[i])) {
-        refrao = /refrão|refrao/i.test(lines[i]) && !/coro/i.test(lines[i])
-        ponte = /ponte|bridge/i.test(lines[i])
-        coro = /coro/i.test(lines[i])
+      const sectionText = sm ? sm[1] : (isSectionLine(lines[i]) ? lines[i] : null)
+      if (sectionText !== null) {
+        const t = detectSectionType(sectionText)
+        prerefrao = t.prerefrao
+        refrao = t.refrao
+        ponte = t.ponte
+        coro = t.coro
         currentSectionLineIdx = i
         currentSectionColor = sectionColors[i] || null
       }
       isRefraoArr[i] = refrao
       isPonteArr[i] = ponte
       isCoroArr[i] = coro
+      isPreRefraoArr[i] = prerefrao
       lineSectionColor[i] = currentSectionColor
     }
     
     // PASSO 2: Agrupar e renderizar
-    type GroupType = { isRefrao: boolean; isPonte: boolean; isCoro: boolean; bgColor: string | null; elements: React.ReactNode[] }
+    type GroupType = { isRefrao: boolean; isPonte: boolean; isCoro: boolean; isPreRefrao: boolean; bgColor: string | null; elements: React.ReactNode[] }
     const groups: GroupType[] = []
     let currentGroup: GroupType | null = null
     let prevWasEmpty = false
@@ -379,9 +389,9 @@ export function CifraEditor({ content, originalContent, originalTom, initialTran
         )
       }
       
-      if (!currentGroup || currentGroup.isRefrao !== lineIsRefrao || currentGroup.isPonte !== isPonteArr[i] || currentGroup.isCoro !== isCoroArr[i] || currentGroup.bgColor !== lineSectionColor[i]) {
+      if (!currentGroup || currentGroup.isRefrao !== lineIsRefrao || currentGroup.isPonte !== isPonteArr[i] || currentGroup.isCoro !== isCoroArr[i] || currentGroup.isPreRefrao !== isPreRefraoArr[i] || currentGroup.bgColor !== lineSectionColor[i]) {
         if (currentGroup) groups.push(currentGroup)
-        currentGroup = { isRefrao: lineIsRefrao, isPonte: isPonteArr[i], isCoro: isCoroArr[i], bgColor: lineSectionColor[i], elements: [element] }
+        currentGroup = { isRefrao: lineIsRefrao, isPonte: isPonteArr[i], isCoro: isCoroArr[i], isPreRefrao: isPreRefraoArr[i], bgColor: lineSectionColor[i], elements: [element] }
       } else {
         currentGroup.elements.push(element)
       }
@@ -420,8 +430,14 @@ export function CifraEditor({ content, originalContent, originalTom, initialTran
         style.borderBottom = `1px solid ${borderColor}`
         style.borderRadius = '4px'
       }
+      const bgClass = group.bgColor ? '' 
+        : group.isPreRefrao ? 'prerefrao-bg'
+        : group.isRefrao ? 'refrao-bg'
+        : group.isPonte ? 'ponte-bg'
+        : group.isCoro ? 'coro-bg'
+        : ''
       return (
-        <div key={gi} className={group.isRefrao && !group.bgColor ? 'refrao-bg' : group.isPonte && !group.bgColor ? 'ponte-bg' : group.isCoro && !group.bgColor ? 'coro-bg' : ''} style={style}>
+        <div key={gi} className={bgClass} style={style}>
           {group.elements}
         </div>
       )
