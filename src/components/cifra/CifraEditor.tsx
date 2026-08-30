@@ -332,7 +332,7 @@ export function CifraEditor({ content, originalContent, originalTom, initialTran
       } else if (isSectionLine(line)) {
         const repeat = sectionRepeats[i]
         const secColor = sectionColors[i]
-        const sectionNameMatch = line.trim().match(/^(\d+x\s*)?(\[?(?:INTRO|INTRODUÇÃO|VERSO|PRÉ-REFRÃO|PRE-REFRÃO|REFRÃO|PONTE|BRIDGE|SOLO|INTERLÚDIO|INTERLUDIO|INSTRUMENTAL|FINAL|CODA|OUTR[OA]|CORO|RAMPA|PRIMEIRA PARTE|SEGUNDA PARTE|TERCEIRA PARTE)\]?)\s*(.*)$/i)
+        const sectionNameMatch = line.trim().match(/^(\d+x\s*)?(\[?(?:INTRODUÇÃO|INTRO|VERSO|PR[ÉE]\s*-?\s*REFR[ÃA]O|REFR[ÃA]O|PONTE|BRIDGE|SOLO|INTERL[ÚU]DIO|INSTRUMENTAL|INSTRUMENTO|FINAL|CODA|OUTR[OA]|CORO|RAMPA|TAG|MINISTRA[ÇC][ÃA]O|PRIMEIRA PARTE|SEGUNDA PARTE|TERCEIRA PARTE)\]?)\s*(.*)$/i)
         const sectionLabel = sectionNameMatch ? (sectionNameMatch[1] || '') + sectionNameMatch[2].replace(/[\[\]]/g, '') : line.trim()
         const sectionRest = sectionNameMatch ? sectionNameMatch[3] : ''
         element = (
@@ -637,7 +637,7 @@ export function CifraEditor({ content, originalContent, originalTom, initialTran
           <div className="cifra-editor-visual">
             {editContent.split('\n').map((line, i, arr) => {
               const isSectionHeader = /^\s*\[([^\]]+)\]/.test(line)
-              const isSectionKeyword = /^\s*(?:\d+x\s*)?\[?(?:INTRO|VERSO|PRÉ-REFRÃO|PRE-REFRÃO|REFRÃO|PONTE|BRIDGE|SOLO|INTERLÚDIO|INTERLUDIO|INSTRUMENTAL|FINAL|CODA|OUTR[OA]|CORO|RAMPA)\]?/i.test(line.trim())
+              const isSectionKeyword = /^\s*(?:\d+x\s*)?\[?(?:INTRO|VERSO|PR[ÉE]\s*-?\s*REFR[ÃA]O|REFR[ÃA]O|PONTE|BRIDGE|SOLO|INTERL[ÚU]DIO|INSTRUMENTAL|INSTRUMENTO|FINAL|CODA|OUTR[OA]|CORO|RAMPA|TAG|MINISTRA[ÇC][ÃA]O)\]?/i.test(line.trim())
               const isSection = isSectionHeader || isSectionKeyword
               const showDivider = isSection && i > 0
 

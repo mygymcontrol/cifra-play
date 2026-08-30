@@ -19,6 +19,10 @@ const SECTION_KEYWORDS = [
   'VERSO',
   'PRÉ-REFRÃO',
   'PRE-REFRÃO',
+  'PRÉ REFRÃO',
+  'PRE REFRÃO',
+  'PRÉ REFRAO',
+  'PRE REFRAO',
   'REFRÃO',
   'PONTE',
   'BRIDGE',
@@ -26,22 +30,29 @@ const SECTION_KEYWORDS = [
   'INTERLÚDIO',
   'INTERLUDIO',
   'INSTRUMENTAL',
+  'INSTRUMENTO',
   'FINAL',
   'CODA',
   'OUTRO',
   'OUTRA',
   'RIFF',
   'TAB',
+  'TAG',
   'CORO',
   'RAMPA',
+  'MINISTRAÇÃO',
+  'MINISTRACAO',
   'PRIMEIRA PARTE',
   'SEGUNDA PARTE',
   'TERCEIRA PARTE',
 ]
 
+// Ordena por comprimento decrescente para priorizar "PRÉ REFRÃO" antes de "REFRÃO"
+const SORTED_KEYWORDS = [...SECTION_KEYWORDS].sort((a, b) => b.length - a.length)
+
 // Regex that matches section patterns
 const SECTION_REGEX = new RegExp(
-  `^\\s*(?:\\d+x\\s*)?\\[?(?:${SECTION_KEYWORDS.join('|')})\\]?`,
+  `^\\s*(?:\\d+x\\s*)?\\[?(?:${SORTED_KEYWORDS.join('|')})\\]?`,
   'i'
 )
 

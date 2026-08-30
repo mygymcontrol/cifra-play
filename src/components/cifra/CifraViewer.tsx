@@ -118,7 +118,7 @@ export function CifraViewer({ content, originalTom, title, artist }: CifraViewer
         )
       } else if (isSectionLine(line)) {
         // Extrair o nome da seção e o resto (acordes após o nome)
-        const sectionNameMatch = line.trim().match(/^(\d+x\s*)?(\[?(?:INTRO|INTRODUÇÃO|VERSO|PRÉ-REFRÃO|PRE-REFRÃO|REFRÃO|PONTE|BRIDGE|SOLO|INTERLÚDIO|INTERLUDIO|INSTRUMENTAL|FINAL|CODA|OUTR[OA]|CORO|RAMPA|PRIMEIRA PARTE|SEGUNDA PARTE|TERCEIRA PARTE)\]?)\s*(.*)$/i)
+        const sectionNameMatch = line.trim().match(/^(\d+x\s*)?(\[?(?:INTRODUÇÃO|INTRO|VERSO|PR[ÉE]\s*-?\s*REFR[ÃA]O|REFR[ÃA]O|PONTE|BRIDGE|SOLO|INTERL[ÚU]DIO|INSTRUMENTAL|INSTRUMENTO|FINAL|CODA|OUTR[OA]|CORO|RAMPA|TAG|MINISTRA[ÇC][ÃA]O|PRIMEIRA PARTE|SEGUNDA PARTE|TERCEIRA PARTE)\]?)\s*(.*)$/i)
         if (sectionNameMatch) {
           const prefix = sectionNameMatch[1] || ''
           const sectionName = sectionNameMatch[2].replace(/[\[\]]/g, '')
